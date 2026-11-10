@@ -96,7 +96,8 @@ describe('save_onboarding', () => {
   });
 
   it('enforces length and count limits in the database', async () => {
-    await expect(save(A, 'N', 'x'.repeat(501), [])).rejects.toThrow();
+    await expect(save(A, 'N', 'x'.repeat(550), [])).resolves.toBeDefined(); // exactly at the limit
+    await expect(save(A, 'N', 'x'.repeat(551), [])).rejects.toThrow();
     await expect(save(A, 'N', null, [{ id: G1, name: 'x'.repeat(81) }])).rejects.toThrow();
     const eleven = Array.from({ length: 11 }, (_, n) => ({
       id: `00000000-0000-4000-8000-0000000001${String(n).padStart(2, '0')}`,

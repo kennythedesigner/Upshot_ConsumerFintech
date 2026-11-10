@@ -41,13 +41,13 @@ describe('cleanOnboarding', () => {
   });
   it('lists every problem at once', () => {
     const r = cleanOnboarding({
-      businessGoal: 'x'.repeat(501),
+      businessGoal: 'x'.repeat(551),
       goals: [{ id: G1, name: 'Trust' }, { id: G2, name: 'trust' }, { id: 'bad', name: '' }],
     });
     expect(r.ok).toBe(false);
     if (!r.ok) {
       expect(r.problems).toEqual([
-        'Keep the business goal to 500 characters.',
+        'Keep the business goal to 550 characters.',
         '"trust" is listed twice.',
         'Goal 3 is missing its id.',
         'Goal 3 needs a name.',

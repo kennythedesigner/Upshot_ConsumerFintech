@@ -10,7 +10,7 @@
 
 export const LIMITS = {
   portfolioName: 100,
-  businessGoal: 500,
+  businessGoal: 550,
   goalName: 80,
   goalCount: 10,
 } as const;

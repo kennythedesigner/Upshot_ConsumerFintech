@@ -59,7 +59,7 @@ Each is a one-line change. Flagged for a yes/no.
 | 9 | Overlap warning "N initiatives overlap" | N = initiatives in any overlapping pair | `overlap.ts` |
 | 10 | Initiatives with no goal tag | Grouped as a "No goal" subtotal | `portfolio.ts` |
 | 11 | How many goals in the list (D33 says "short") | 10 at most | migration, `clean.ts` |
-| 12 | Text length limits | Business goal 500 characters, goal name 80, portfolio name 100 | migration, `clean.ts` |
+| 12 | Text length limits | Business goal 550 characters, goal name 80, portfolio name 100 | migration, `clean.ts` |
 | 13 | Duplicate goal names | Rejected, ignoring case ("Trust" and "trust") | `clean.ts` |
 | 14 | Line breaks in the business goal | Collapsed to spaces (it's one line in the dashboard header) | `clean.ts` |
 | 15 | Checklist 3 says escape "on write" | Cleaned and length-checked on write, escaped on render. Escaping on write would show "&amp;" to the PM | `clean.ts` |

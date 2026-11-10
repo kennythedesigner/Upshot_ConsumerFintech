@@ -17,7 +17,7 @@ create table public.portfolio (
   name          text not null default 'My portfolio'
                   check (char_length(name) between 1 and 100),
   business_goal text
-                  check (business_goal is null or char_length(business_goal) <= 500),
+                  check (business_goal is null or char_length(business_goal) <= 550),
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now(),
   -- One portfolio per visitor in V1, so re-submitting onboarding updates the
