@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets and environment files — never commit real keys.
+# The service-role key and the Turnstile secret key must never live in this repo.
+.env
+.env.*
+!.env.example
