@@ -65,13 +65,13 @@ Rule: **save inputs, never outputs.** Every number on screen is recomputed by th
 | 6 | Not-live initiative in the portfolio | Counted: $0 impact, build cost added to total cost | `portfolio.ts` |
 | 7 | Incomplete initiative in the portfolio | Listed, not summed | `portfolio.ts` |
 | 8 | "How much of the total is must-do" (D45) | Reports count, expected impact and total cost | `portfolio.ts` |
+| 9 | Overlap warning "N initiatives overlap" | N = initiatives in any overlapping pair | `overlap.ts` |
+| 10 | Initiatives with no goal tag | Grouped as a "No goal" subtotal | `portfolio.ts` |
 
-## Judgment calls still to confirm (D60a, D61)
+## Still to confirm (D61)
 
 | # | Situation | What the code does | Where |
 |---|---|---|---|
-| 9 | Overlap warning "N initiatives overlap" | N = initiatives in any overlapping pair | `overlap.ts` |
-| 10 | Initiatives with no goal tag | Grouped as a "No goal" subtotal | `portfolio.ts` |
 | 11 | Checklist 3 says escape "on write" | Cleaned and length-checked on write, escaped on render. Escaping on write would show "&amp;amp;" to the PM | `clean.ts` |
 | 12 | Portfolio name, which no screen asks for yet | Saved as "My portfolio" by default | migration |
 
