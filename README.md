@@ -53,9 +53,7 @@ Rule: **save inputs, never outputs.** Every number on screen is recomputed by th
 | Duplicate goal names | Rejected, ignoring case ("Trust" and "trust") | `clean.ts` |
 | Line breaks in the business goal | Saved as one line | `clean.ts` |
 
-## Judgment calls still to confirm
-
-Each is a one-line change. Flagged for a yes/no (logged as [IMPLIED] in the decision log).
+## Decided engine edge cases (D60, confirmed 2026-11-09)
 
 | # | Situation | What the code does | Where |
 |---|---|---|---|
@@ -67,6 +65,11 @@ Each is a one-line change. Flagged for a yes/no (logged as [IMPLIED] in the deci
 | 6 | Not-live initiative in the portfolio | Counted: $0 impact, build cost added to total cost | `portfolio.ts` |
 | 7 | Incomplete initiative in the portfolio | Listed, not summed | `portfolio.ts` |
 | 8 | "How much of the total is must-do" (D45) | Reports count, expected impact and total cost | `portfolio.ts` |
+
+## Judgment calls still to confirm (D60a, D61)
+
+| # | Situation | What the code does | Where |
+|---|---|---|---|
 | 9 | Overlap warning "N initiatives overlap" | N = initiatives in any overlapping pair | `overlap.ts` |
 | 10 | Initiatives with no goal tag | Grouped as a "No goal" subtotal | `portfolio.ts` |
 | 11 | Checklist 3 says escape "on write" | Cleaned and length-checked on write, escaped on render. Escaping on write would show "&amp;amp;" to the PM | `clean.ts` |
