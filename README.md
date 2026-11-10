@@ -68,7 +68,7 @@ Rule: **save inputs, never outputs.** Every number on screen is recomputed by th
 | 9 | Overlap warning "N initiatives overlap" | N = initiatives in any overlapping pair | `overlap.ts` |
 | 10 | Initiatives with no goal tag | Grouped as a "No goal" subtotal | `portfolio.ts` |
 
-## Still to confirm (D61)
+## Decided text handling (D61, confirmed 2026-11-09)
 
 | # | Situation | What the code does | Where |
 |---|---|---|---|
