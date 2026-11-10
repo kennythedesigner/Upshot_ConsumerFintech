@@ -12,6 +12,8 @@
     "check": "npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
+    "@supabase/supabase-js": "^2.119.0",
     "@types/node": "^24.19.2",
     "typescript": "~7.0.2",
     "vite": "^8.3.6",
