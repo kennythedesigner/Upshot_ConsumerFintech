@@ -1,11 +1,11 @@
 # Upshot — calculation engine
 
-The math behind **Upshot - a UX ROI calculator** ([uxroicalculator.app](https://uxroicalculator.app)).
+The math behind **Upshot - a UX ROI calculator** ([upshotpm.app](https://upshotpm.app)).
 It helps a consumer-fintech PM compare two initiatives before either is built, in dollars, with honest ranges. It never names a winner.
 
-This repo holds the **calculation engine**: plain TypeScript functions with no screens. It follows decision log rev 23.
+This repo holds the **calculation engine** and the **Supabase backend** for Onboarding. It follows decision log rev 24.
 
-- **Hosting (D53a):** the calculator is a Framer code component on uxroicalculator.app. There is no separate app or subdomain.
+- **Hosting (D53a):** the calculator is a Framer code component on upshotpm.app (D47). There is no separate app or subdomain.
 - **Delivery:** `npm run build` makes two ES modules the Framer code component imports: `dist/upshot-engine.js` (the math) and `dist/upshot-data.js` (Onboarding save/load).
 - **Database (D53b):** Supabase saves portfolio metadata only (the business goal and the goal/OKR list). Initiatives stay in the session (D57 deferred).
 - **Visitors (D58):** each visitor is a Supabase anonymous user, so row-level security can trust who owns a row. Supabase keeps its sign-in token in the browser; no portfolio data is kept there (D52c).
@@ -42,9 +42,20 @@ supabase/
 
 Rule: **save inputs, never outputs.** Every number on screen is recomputed by the engine.
 
-## Judgment calls made in code (not covered by the decision log)
+## Decided limits (D59, confirmed 2026-11-09)
 
-Each is a one-line change. Flagged for a yes/no.
+| Rule | Value | Where |
+|---|---|---|
+| Goals in the goal/OKR list | 10 at most | migration, `clean.ts` |
+| Business goal length | 550 characters | migration, `clean.ts` |
+| Goal name length | 80 characters | migration, `clean.ts` |
+| Portfolio name length | 100 characters | migration, `clean.ts` |
+| Duplicate goal names | Rejected, ignoring case ("Trust" and "trust") | `clean.ts` |
+| Line breaks in the business goal | Saved as one line | `clean.ts` |
+
+## Judgment calls still to confirm
+
+Each is a one-line change. Flagged for a yes/no (logged as [IMPLIED] in the decision log).
 
 | # | Situation | What the code does | Where |
 |---|---|---|---|
@@ -58,29 +69,8 @@ Each is a one-line change. Flagged for a yes/no.
 | 8 | "How much of the total is must-do" (D45) | Reports count, expected impact and total cost | `portfolio.ts` |
 | 9 | Overlap warning "N initiatives overlap" | N = initiatives in any overlapping pair | `overlap.ts` |
 | 10 | Initiatives with no goal tag | Grouped as a "No goal" subtotal | `portfolio.ts` |
-| 11 | How many goals in the list (D33 says "short") | 10 at most | migration, `clean.ts` |
-| 12 | Text length limits | Business goal 550 characters, goal name 80, portfolio name 100 | migration, `clean.ts` |
-| 13 | Duplicate goal names | Rejected, ignoring case ("Trust" and "trust") | `clean.ts` |
-| 14 | Line breaks in the business goal | Collapsed to spaces (it's one line in the dashboard header) | `clean.ts` |
-| 15 | Checklist 3 says escape "on write" | Cleaned and length-checked on write, escaped on render. Escaping on write would show "&amp;" to the PM | `clean.ts` |
-| 16 | Portfolio name, which no screen asks for yet | Saved as "My portfolio" by default | migration |
-
-## Supabase setup (one time)
-
-1. Create a Supabase project.
-2. **Authentication → Sign In / Providers:** turn on **Anonymous sign-ins**.
-3. **Authentication → Attack Protection:** turn on CAPTCHA (Cloudflare Turnstile). Supabase strongly recommends this for anonymous sign-ins, since bots can otherwise create users in bulk.
-4. **SQL editor:** run `supabase/migrations/20261110000000_portfolio_metadata.sql`.
-5. In the Framer component, use the project URL and the **anon (public) key only**. Never paste the service-role key anywhere in Framer; it bypasses every security rule.
-
-Security rules in the migration:
-- Signed-out requests get nothing.
-- A visitor can only read, change or delete their own portfolio and goals.
-- One portfolio per visitor, so re-submitting Onboarding updates it rather than duplicating it.
-- Onboarding saves in one transaction: the whole goal list or nothing.
-- Length limits live in the database too, not just the screen.
-
-Rendering rule: show saved text as plain React text. Never use `dangerouslySetInnerHTML` for it.
+| 11 | Checklist 3 says escape "on write" | Cleaned and length-checked on write, escaped on render. Escaping on write would show "&amp;amp;" to the PM | `clean.ts` |
+| 12 | Portfolio name, which no screen asks for yet | Saved as "My portfolio" by default | migration |
 
 ## Not built yet
 

@@ -8,6 +8,7 @@
  * dangerouslySetInnerHTML for these fields.
  */
 
+/** D59 (confirmed 2026-11-09). The migration's check constraints must match. */
 export const LIMITS = {
   portfolioName: 100,
   businessGoal: 550,

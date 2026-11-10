@@ -2,7 +2,7 @@
   "name": "upshot-engine",
   "private": true,
   "version": "0.1.0",
-  "description": "Calculation engine for Upshot - a UX ROI calculator (uxroicalculator.app)",
+  "description": "Calculation engine for Upshot - a UX ROI calculator (upshotpm.app)",
   "type": "module",
   "scripts": {
     "test": "vitest run",

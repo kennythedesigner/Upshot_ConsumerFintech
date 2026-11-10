@@ -150,7 +150,7 @@ export function calculateBucket(
     endA = liftPts * (1 - spread);
     endB = liftPts * (1 + spread);
   }
-  // A lift can't exceed 100 points (every affected consumer). See README "Judgment calls".
+  // A lift can't exceed 100 points (every affected consumer). See README "Judgment calls still to confirm", #1.
   const liftLow = clampLift(Math.min(endA, endB));
   const liftHigh = clampLift(Math.max(endA, endB));
 

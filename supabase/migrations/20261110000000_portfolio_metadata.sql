@@ -1,4 +1,4 @@
--- Upshot V1: portfolio metadata (D53b, D52b, D52c, D58)
+-- Upshot V1: portfolio metadata (D53b, D52b, D52c, D58, D59)
 --
 -- Stores ONLY the business goal and the goal/OKR list. Initiatives stay in the
 -- calculator session (D57 deferred).
