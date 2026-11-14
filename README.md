@@ -36,7 +36,8 @@ src/data/
   clean.ts        # cleans and checks Onboarding text before saving (checklist 3)
   portfolioMeta.ts  # anonymous session, load/save Onboarding, plain-language errors
 supabase/
-  migrations/     # tables, RLS policies, save_onboarding function
+  migrations/     # tables, RLS policies, save_onboarding, retention functions
+  jobs/           # run-once operational SQL (the retention cron job)
   __tests__/      # proves visitor B can't read or change visitor A's rows
 ```
 
@@ -75,7 +76,27 @@ Rule: **save inputs, never outputs.** Every number on screen is recomputed by th
 | 11 | Checklist 3 says escape "on write" | Cleaned and length-checked on write, escaped on render. Escaping on write would show "&amp;amp;" to the PM | `clean.ts` |
 | 12 | Portfolio name, which no screen asks for yet | Saved as "My portfolio" by default | migration |
 
+## Decided data retention (D62, confirmed 2026-11-14)
+
+A visitor's rows are reachable only through the Supabase session token in their
+browser (D58). Clear the browser and those rows are unreachable by the visitor
+and by us, so a deletion request can never find them. The button covers people
+who still have their session; the sweep covers everyone else.
+
+| # | Rule | Value | Where |
+|---|---|---|---|
+| 13 | Onboarding metadata still persists | Kept. D57 will persist initiatives too, so the table is not throwaway | — |
+| 14 | Retention window | 90 days since the portfolio was last saved, or since sign-in if nothing was saved | `delete_stale_visitors()` |
+| 15 | Visitors who never saved | Swept on the same window, by `auth.users.created_at` | `delete_stale_visitors()` |
+| 16 | On-demand deletion | `delete_my_data()`, called by the "Delete my saved data" control | `delete_my_data()` |
+| 17 | The `auth.users` row | Removed by the sweep, not by the visitor — a client cannot delete an auth user | `delete_stale_visitors()` |
+| 18 | Sweep schedule | Daily at 03:00 UTC, pg_cron job `upshot-delete-stale-visitors` | `supabase/jobs/` |
+| 19 | Undo on deletion | None. The row is gone, so the undo-toast pattern does not apply; a confirm does | UI |
+
 ## Not built yet
 
 - Framer code component (waits on the Figma screens)
 - E2E flow tests (checklist section 2)
+- The "Delete my saved data" control (the function behind it is live)
+- Privacy policy (inputs now settled: what is stored, 90 days, in-product delete,
+  Supabase as processor)
