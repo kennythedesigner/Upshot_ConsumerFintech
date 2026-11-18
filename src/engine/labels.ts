@@ -62,8 +62,9 @@ export const PRESSURE_LABEL: Record<PressurePattern, string> = {
   stressful_moment: 'Shown at a stressful moment (after a declined payment or overdraft)',
 };
 
+/** On-screen names for the three value buckets (D09: Value Now, Value Later, Value Saved). */
 export const BUCKET_LABEL: Record<BucketKind, string> = {
-  now: 'Value Now',
-  later: 'Value Later',
-  saved: 'Value Saved',
+  now: 'Revenue now',
+  later: 'Retention',
+  saved: 'Cost saved',
 };

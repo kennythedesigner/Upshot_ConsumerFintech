@@ -2,6 +2,8 @@
 //   dist/upshot-engine.js — the math. No React, no screens, no network.
 //   dist/upshot-data.js   — Onboarding save/load. Takes a Supabase client the
 //                           component creates; supabase-js is not bundled in.
+/// <reference types="vitest/config" />
+import { configDefaults } from 'vitest/config';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -16,5 +18,9 @@ export default defineConfig({
     },
     target: 'es2022',
     sourcemap: true,
+  },
+  test: {
+    // The app (app/) has its own config and tests; it runs them itself.
+    exclude: [...configDefaults.exclude, 'app/**'],
   },
 });

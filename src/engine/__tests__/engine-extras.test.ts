@@ -190,7 +190,9 @@ describe('display (D51)', () => {
     expect(formatDollars(-15_050)).toBe('-$15,100');
   });
   it('percent and score precision', () => {
-    expect(formatPercent(-940)).toBe('-940.0%');
+    expect(formatPercent(-940)).toBe('-940%');
+    expect(formatPercent(997.96)).toBe('998%');
+    expect(formatPercent(1272.5)).toBe('1,273%');
     expect(formatScore(0.288)).toBe('0.29');
   });
 });

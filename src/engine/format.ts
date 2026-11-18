@@ -31,8 +31,8 @@ export function roundDollars(value: number): number {
 
 export const formatDollars = (value: number): string => usd.format(roundDollars(value));
 
-/** Proposed: percentages to 1 decimal. */
-export const formatPercent = (value: number): string => `${oneDecimal.format(roundTo(value, 0.1))}%`;
+/** Whole percent. ROI runs into the hundreds, where a decimal is false precision. */
+export const formatPercent = (value: number): string => `${whole.format(roundTo(value, 1))}%`;
 
 /** ROI spread is in percentage points (D40). */
 export const formatPoints = (value: number): string => `${whole.format(roundTo(value, 1))} pts`;

@@ -18,6 +18,26 @@ npm test         # engine, data layer, and RLS tests (runs the real migration in
 npm run check    # type-check + tests + build (what CI runs)
 ```
 
+## The calculator app (`app/`)
+
+The screens, in plain React, styled with the Upshot design system. The app imports the engine's
+source from `src/engine`, so the screens and `dist/upshot-engine.js` share one copy of the math.
+Nothing on screen is hardcoded: every figure is recalculated from the inputs.
+
+Built so far: the **initiative screen** — all seven input groups, the horizon slider, the
+"Your numbers" panel (net value and ROI ranges, the base-case ledger, assumptions), flags, and the
+empty / incomplete / not-live states. Saved initiatives stay in this browser tab's session (D57).
+
+```bash
+cd app
+npm install      # once
+npm run dev      # local preview at http://localhost:5173
+npm run check    # type-check + tests + build (CI runs this too)
+```
+
+Fonts (Newsreader, Public Sans) are bundled with the app, not loaded from Google Fonts, so a visit
+makes no third-party requests.
+
 ## Layout
 
 ```
@@ -35,6 +55,7 @@ src/engine/
 src/data/
   clean.ts        # cleans and checks Onboarding text before saving (checklist 3)
   portfolioMeta.ts  # anonymous session, load/save Onboarding, plain-language errors
+app/              # the calculator screens (React); imports src/engine
 supabase/
   migrations/     # tables, RLS policies, save_onboarding, retention functions
   jobs/           # run-once operational SQL (the retention cron job)
@@ -95,7 +116,9 @@ who still have their session; the sweep covers everyone else.
 
 ## Not built yet
 
-- Framer code component (waits on the Figma screens)
+- Comparison screen and dashboard (the initiative screen is in `app/`)
+- Where the app is hosted. D53a assumed a Framer code component; `app/` is a standalone React
+  app that can be deployed on its own or embedded
 - E2E flow tests (checklist section 2)
 - The "Delete my saved data" control (the function behind it is live)
 - Privacy policy (inputs now settled: what is stored, 90 days, in-product delete,
