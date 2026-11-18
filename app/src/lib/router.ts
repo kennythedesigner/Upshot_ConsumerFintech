@@ -1,6 +1,6 @@
 /**
  * Screens are addressed by a plain #name, so links can be bookmarked and sent:
- *   #initiatives          the list (home)
+ *   #dashboard            the dashboard (home); #initiatives still opens it
  *   #new                  a new initiative
  *   #edit-<initiative id> an existing one
  *   #compare              A vs B
@@ -8,12 +8,12 @@
  */
 
 export type Route =
-  | { screen: 'initiatives' }
+  | { screen: 'dashboard' }
   | { screen: 'new' }
   | { screen: 'edit'; id: string }
   | { screen: 'compare' };
 
-export const HOME: Route = { screen: 'initiatives' };
+export const HOME: Route = { screen: 'dashboard' };
 
 export function parseHash(hash: string): Route {
   const name = hash.replace(/^#/, '');
@@ -26,8 +26,8 @@ export function parseHash(hash: string): Route {
 
 export function toHash(route: Route): string {
   switch (route.screen) {
-    case 'initiatives':
-      return '#initiatives';
+    case 'dashboard':
+      return '#dashboard';
     case 'new':
       return '#new';
     case 'edit':

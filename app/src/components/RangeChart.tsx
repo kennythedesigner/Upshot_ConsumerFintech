@@ -9,8 +9,9 @@
  * below carries every value without hovering.
  */
 import type { Range } from '@engine';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCountedValue } from '../lib/motion';
+import { useWidth } from '../lib/useWidth';
 
 export interface RangeSeries {
   key: string;
@@ -50,20 +51,6 @@ export function niceTicks(min: number, max: number, count: number): number[] {
   const ticks: number[] = [];
   for (let v = start; v <= max + step * 0.5; v += step) ticks.push(Math.abs(v) < step / 1e6 ? 0 : v);
   return ticks;
-}
-
-function useWidth<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const [width, setWidth] = useState(0);
-  useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    setWidth(el.clientWidth);
-    const ro = new ResizeObserver(([entry]) => entry && setWidth(entry.contentRect.width));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-  return [ref, width] as const;
 }
 
 /** A row's band and dot count toward new values with the horizon, like every other figure. */

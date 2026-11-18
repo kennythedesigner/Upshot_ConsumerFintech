@@ -403,8 +403,8 @@ export function CompareScreen({ initiatives, colors, pair, horizon, onHorizonCha
               <a className="button button--primary" href="#new">
                 New initiative
               </a>
-              <a className="button button--secondary" href="#initiatives">
-                All initiatives
+              <a className="button button--secondary" href="#dashboard">
+                Dashboard
               </a>
             </div>
           </section>

@@ -1,4 +1,4 @@
-import { calculateInitiative, createPortfolio } from '@engine';
+import { calculateInitiative, calculatePortfolio, createInitiative, createPortfolio, type HorizonMonths } from '@engine';
 import { describe, expect, it } from 'vitest';
 import { workedExample, workedExampleB, workedPair } from '../example';
 import { formatForInput, money, parseNumberInput, percent, signedMoney } from '../numbers';
@@ -6,6 +6,7 @@ import { parseHash, toHash } from '../router';
 import { normalize, removeInitiative, restoreInitiative, upsertInitiative } from '../session';
 import { OTHER, assignColors } from '../series';
 import { niceTicks } from '../../components/RangeChart';
+import { sortInitiatives } from '../../screens/DashboardScreen';
 
 describe('reading typed numbers', () => {
   it('accepts the ways people actually type', () => {
@@ -110,10 +111,10 @@ describe('initiative B, the premium-upgrade prompt', () => {
 
 describe('routes', () => {
   it('reads and writes plain #names', () => {
-    expect(parseHash('')).toEqual({ screen: 'initiatives' });
+    expect(parseHash('')).toEqual({ screen: 'dashboard' });
     expect(parseHash('#new')).toEqual({ screen: 'new' });
     expect(parseHash('#edit-3f2a-9c')).toEqual({ screen: 'edit', id: '3f2a-9c' });
-    expect(parseHash('#settings')).toEqual({ screen: 'initiatives' });
+    expect(parseHash('#settings')).toEqual({ screen: 'dashboard' });
     expect(toHash({ screen: 'edit', id: 'abc-1' })).toBe('#edit-abc-1');
   });
 });
@@ -166,7 +167,7 @@ describe('the compared pair', () => {
   const base = () => {
     const d = createPortfolio();
     const [a, b] = workedPair(d.portfolio.id);
-    return { doc: { ...d, initiatives: [a, b] }, exampleIds: [], colors: {}, compare: { a: null, b: null } };
+    return { doc: { ...d, initiatives: [a, b] }, exampleIds: [], colors: {}, compare: { a: null, b: null }, sort: 'added' as const };
   };
 
   it('defaults to the first two, in list order', () => {
@@ -190,5 +191,49 @@ describe('chart ticks', () => {
     expect(t.every((v) => v % 500_000 === 0)).toBe(true);
     expect(t[0]).toBeLessThanOrEqual(-500_000);
     expect(t.at(-1)).toBeGreaterThanOrEqual(3_500_000);
+  });
+});
+
+describe('the dashboard', () => {
+  const twelve = () => {
+    const d = createPortfolio();
+    d.portfolio.horizon_months = 12 as HorizonMonths;
+    const [a, b] = workedPair(d.portfolio.id);
+    return { ...d, initiatives: [a, b] };
+  };
+
+  it('adds base cases only, matching the hand math at 12 months', () => {
+    const p = calculatePortfolio(twelve());
+    // A: 2,427,840 expected, 240,000 cost. B: 1,108,800 expected, 90,000 + 11 × 1,500 = 106,500 cost.
+    expect(p.totals.expectedImpact).toBeCloseTo(3_536_640, 2);
+    expect(p.totals.totalCost).toBe(346_500);
+    // Weighted: A at medium (0.6) + B at low (0.3).
+    expect(p.totals.confidenceWeightedImpact).toBeCloseTo(2_427_840 * 0.6 + 1_108_800 * 0.3, 2);
+    // (3,536,640 − 346,500) ÷ 346,500.
+    expect(p.totals.roiPct).toBeCloseTo(920.675, 2);
+    expect(p.notCounted).toEqual([]);
+  });
+
+  it('leaves an initiative missing inputs out of the totals', () => {
+    const doc = twelve();
+    const blank = createInitiative(doc.portfolio.id, 'Half-filled');
+    const p = calculatePortfolio({ ...doc, initiatives: [...doc.initiatives, blank] });
+    expect(p.notCounted).toEqual([blank.id]);
+    expect(p.totals.totalCost).toBe(346_500);
+  });
+
+  it('sorts as a lens, keeping rows without figures last', () => {
+    const doc = twelve();
+    const [a, b] = doc.initiatives;
+    const blank = createInitiative(doc.portfolio.id, 'Half-filled');
+    const list = [blank, a!, b!];
+    const { results } = calculatePortfolio({ ...doc, initiatives: list });
+    const order = (key: Parameters<typeof sortInitiatives>[2]) =>
+      sortInitiatives(list, results, key).map((i) => i.name);
+    expect(order('added')).toEqual([blank.name, a!.name, b!.name]);
+    expect(order('net')).toEqual([a!.name, b!.name, blank.name]);
+    expect(order('roi')).toEqual([b!.name, a!.name, blank.name]); // 941% vs 912%
+    expect(order('spread')).toEqual([b!.name, a!.name, blank.name]); // 1,562 vs 1,098 pts
+    expect(order('priority')).toEqual([a!.name, b!.name, blank.name]); // 6.07 vs 3.12
   });
 });

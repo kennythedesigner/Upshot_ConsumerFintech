@@ -1648,6 +1648,11 @@ ul {
   margin-top: 0;
 }
 
+.impact-map .range-chart-head {
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
 .range-chart-plot {
   position: relative;
 }
@@ -1943,6 +1948,236 @@ ul {
 }
 
 /* On the dark ground a 35% band sinks too far; lift it so the span still reads. */
+/* ── Dashboard ─────────────────────────────────────────────────────────── */
+
+.dashboard {
+  display: grid;
+  gap: var(--space-7);
+  padding: var(--space-6) var(--page-x) var(--space-7);
+}
+
+.dashboard > .example-note {
+  margin-top: 0;
+  margin-bottom: calc(var(--space-2) - var(--space-7) + var(--space-5));
+}
+
+.section-heading {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  color: var(--ink);
+}
+
+.heading-count {
+  margin-left: var(--space-1);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-secondary);
+}
+
+.section-head {
+  display: grid;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--rule);
+}
+
+.section-head .section-sub {
+  margin-top: 0;
+}
+
+.totals {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* Four totals. Not Low / Base / High: no portfolio range exists (D45), so
+   all four sit at the same weight and none is the "answer". */
+.stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+
+.stat {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--surface-raised);
+  border-radius: var(--radius-md);
+}
+
+.stat-label {
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.stat-value {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.stat-sub {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-secondary);
+}
+
+.totals-notes {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 80ch;
+}
+
+.note-head + .overlap-pairs {
+  margin-top: var(--space-2);
+}
+
+.overlap-pairs {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--ink-secondary);
+}
+
+.map-section {
+  display: grid;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--rule);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.map-section .legend {
+  order: 2;
+}
+
+.map-section .impact-map {
+  order: 1;
+}
+
+.map-section > .panel-text {
+  order: 3;
+}
+
+.swatch--round {
+  border-radius: 50%;
+}
+
+.swatch--diamond {
+  width: 9px;
+  height: 9px;
+  border-radius: 0;
+  background: var(--ink-muted);
+  transform: translateY(0) rotate(45deg) !important;
+}
+
+.legend-shape {
+  color: var(--ink-secondary);
+}
+
+.impact-map {
+  margin: 0;
+  min-width: 0;
+  max-width: 960px;
+}
+
+.map-mark {
+  stroke: var(--paper);
+  stroke-width: 2;
+}
+
+.map-label {
+  font-size: 13px;
+  font-weight: 500;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.map-band {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.rows-section .list-head {
+  align-items: end;
+}
+
+.sort {
+  display: grid;
+  grid-template-columns: auto minmax(0, 280px);
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+
+.sort-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.control--compact {
+  min-height: 44px;
+  font-size: 15px;
+}
+
+.sort-helper {
+  grid-column: 2;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-secondary);
+}
+
+/* Eight columns: let the figures sit tighter than the two-column list did. */
+.dashboard-table th:nth-child(4),
+.dashboard-table td:nth-child(4) {
+  padding-left: var(--space-4);
+}
+
+.dashboard-table td.num {
+  font-size: 17px;
+}
+
+@media (max-width: 1099px) and (min-width: 720px) {
+  .dashboard-table .row-name {
+    font-size: 18px;
+    line-height: 24px;
+  }
+  .dashboard-table th,
+  .dashboard-table td {
+    padding-right: var(--space-3);
+  }
+}
+
+@media (max-width: 719px) {
+  .sort {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+  .sort-helper {
+    grid-column: 1;
+  }
+  .stat-value {
+    font-size: 24px;
+    line-height: 30px;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   .range-band {
     opacity: 0.5;

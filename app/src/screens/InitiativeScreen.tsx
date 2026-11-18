@@ -91,7 +91,7 @@ export function InitiativeScreen({
       <PageHead
         title={title}
         subtitle="Turn your UX assumptions into a business case."
-        back={<a href="#initiatives">← All initiatives</a>}
+        back={<a href="#dashboard">← Dashboard</a>}
         horizon={horizon}
         onHorizonChange={onHorizonChange}
         action={

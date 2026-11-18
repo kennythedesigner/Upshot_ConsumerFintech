@@ -26,10 +26,11 @@ import {
   saveSession,
   upsertInitiative,
   type Session,
+  type SortKey,
 } from './lib/session';
 import { CompareScreen } from './screens/CompareScreen';
 import { InitiativeScreen } from './screens/InitiativeScreen';
-import { InitiativesScreen } from './screens/InitiativesScreen';
+import { DashboardScreen } from './screens/DashboardScreen';
 
 /** Compare drafts by content; the save timestamp alone isn't a change. */
 const fingerprint = (i: Initiative): string => JSON.stringify({ ...i, updated_at: '' });
@@ -49,6 +50,7 @@ function seeded(): Session {
     exampleIds: [a.id, b.id],
     colors: {},
     compare: { a: a.id, b: b.id },
+    sort: 'added',
   });
 }
 
@@ -116,7 +118,7 @@ export default function App() {
     setPending(null);
     setSaveStatus(null);
     setHorizonMoved(false);
-    if (opened.route.screen !== 'initiatives') setRemoved(null);
+    if (opened.route.screen !== 'dashboard') setRemoved(null);
     const hash = toHash(opened.route);
     if (push && window.location.hash !== hash) window.history.pushState(null, '', hash);
     else if (opened.missing) window.history.replaceState(null, '', hash);
@@ -229,13 +231,21 @@ export default function App() {
       return { ...s, compare: { ...s.compare, [slot]: id } };
     });
 
+  const changeSort = (sort: SortKey) => setSession((s) => ({ ...s, sort }));
+
+  /** From the overlap warning: put the pair in Compare and go there. */
+  const compareFrom = (a: string, b: string) => {
+    setSession((s) => ({ ...s, compare: { a, b } }));
+    show({ screen: 'compare' }, true);
+  };
+
   const swap = () => setSession((s) => ({ ...s, compare: { a: s.compare.b, b: s.compare.a } }));
 
   // The tab title follows the screen.
   useEffect(() => {
     const title =
-      route.screen === 'initiatives'
-        ? 'Initiatives'
+      route.screen === 'dashboard'
+        ? 'Dashboard'
         : route.screen === 'compare'
           ? 'Compare'
           : route.screen === 'new' && !draft?.name.trim()
@@ -268,7 +278,7 @@ export default function App() {
         </a>
       )}
 
-      <TopBar current={route.screen === 'initiatives' ? 'initiatives' : route.screen === 'compare' ? 'compare' : null} />
+      <TopBar current={route.screen === 'dashboard' ? 'dashboard' : route.screen === 'compare' ? 'compare' : null} />
 
       {pending && (
         <section className="leave-banner" aria-labelledby="leave-title">
@@ -314,11 +324,14 @@ export default function App() {
           onPick={pick}
           onSwap={swap}
         />
-      ) : route.screen === 'initiatives' || !draft ? (
-        <InitiativesScreen
+      ) : route.screen === 'dashboard' || !draft ? (
+        <DashboardScreen
           doc={session.doc}
           exampleIds={session.exampleIds}
           colors={session.colors}
+          sort={session.sort}
+          onSortChange={changeSort}
+          onCompare={compareFrom}
           horizon={horizon}
           onHorizonChange={changeHorizon}
           onDelete={remove}

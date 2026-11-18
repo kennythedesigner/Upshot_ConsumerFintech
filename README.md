@@ -26,8 +26,13 @@ Nothing on screen is hardcoded: every figure is recalculated from the inputs.
 
 Built so far:
 
-- **Initiatives** (`#initiatives`, home): every initiative in the session with its base-case net
-  value and ROI at the shared horizon, in the order added. Delete with undo; empty state.
+- **Dashboard** (`#dashboard`, home; `#initiatives` still works): portfolio totals at the shared
+  horizon (expected impact, confidence-weighted impact, total cost, portfolio ROI; base cases only,
+  ranges aren't summed, D45), the must-do share, which initiatives are left out for missing inputs,
+  the double-count warning naming overlapping pairs (D44), the impact-vs-complexity map (D26;
+  must-do drawn as a diamond), and every initiative with net value, ROI, ROI spread, Priority Score
+  and complexity. Sorting is a lens, not a ranking; the default is the order added. Delete with
+  undo; empty state. Goal subtotals are a later update.
 - **Initiative screen** (`#new`, `#edit-<id>`): all seven input groups, the "Your numbers" panel
   (net value and ROI ranges, the base-case ledger, assumptions), flags, and the empty / incomplete /
   not-live states. Leaving with unsaved changes asks first.
@@ -40,7 +45,7 @@ Built so far:
   (D06). Each initiative keeps one colour on every screen. Everything stays in this browser tab's
   session (D57).
 
-Next: the dashboard (totals, must-do share, the impact-vs-complexity map, overlap warning).
+Next: review, then the marketing site.
 
 ```bash
 cd app
@@ -130,7 +135,7 @@ who still have their session; the sweep covers everyone else.
 
 ## Not built yet
 
-- Comparison screen and dashboard (the initiative screen is in `app/`)
+- Goal / OKR subtotals on the dashboard
 - Where the app is hosted. D53a assumed a Framer code component; `app/` is a standalone React
   app that can be deployed on its own or embedded
 - E2E flow tests (checklist section 2)

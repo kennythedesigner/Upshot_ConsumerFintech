@@ -14,12 +14,17 @@ export interface ComparePair {
   b: string | null;
 }
 
-/** What the tab keeps: the portfolio, which initiatives are the worked example, colours, and the compared pair. */
+/** How the dashboard orders its rows. Every order is a lens, never a ranking (D40). */
+export const SORT_KEYS = ['added', 'net', 'roi', 'spread', 'priority', 'complexity'] as const;
+export type SortKey = (typeof SORT_KEYS)[number];
+
+/** What the tab keeps: the portfolio, which initiatives are the worked example, colours, the compared pair and the sort. */
 export interface Session {
   doc: PortfolioDocument;
   exampleIds: string[];
   colors: ColorMap;
   compare: ComparePair;
+  sort: SortKey;
 }
 
 /**
@@ -70,6 +75,7 @@ export function loadSession(): Session | null {
         a: typeof compare.a === 'string' ? compare.a : null,
         b: typeof compare.b === 'string' ? compare.b : null,
       },
+      sort: (SORT_KEYS as readonly unknown[]).includes(parsed.sort) ? (parsed.sort as SortKey) : 'added',
     });
   } catch {
     return null;
