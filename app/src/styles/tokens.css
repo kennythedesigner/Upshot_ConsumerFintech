@@ -20,6 +20,13 @@
   --on-accent: #fcfcfb;
   --control-border: var(--ink-muted);
 
+  /* One colour per initiative, in fixed order, never by rank. Past four: Other. */
+  --series-1: #00938a;
+  --series-2: #cc5500;
+  --series-3: #3d5ccc;
+  --series-4: #94700a;
+  --series-other: var(--ink-muted);
+
   --font-serif: 'Newsreader Variable', Newsreader, Georgia, serif;
   --font-sans: 'Public Sans Variable', 'Public Sans', system-ui, sans-serif;
 
@@ -49,5 +56,6 @@
     --accent: #4fc9b8;
     --accent-mark: #00938a;
     --on-accent: #1a1a19;
+    --series-3: #5a72d6;
   }
 }

@@ -14,10 +14,12 @@ import {
 import { useMemo } from 'react';
 import { PageHead } from '../components/PageHead';
 import { money, percent } from '../lib/numbers';
+import { seriesVar, type ColorMap } from '../lib/series';
 
 interface InitiativesScreenProps {
   doc: PortfolioDocument;
   exampleIds: string[];
+  colors: ColorMap;
   horizon: HorizonMonths;
   onHorizonChange: (h: HorizonMonths) => void;
   onDelete: (id: string) => void;
@@ -61,6 +63,7 @@ function Notes({ r, mustDo }: { r: InitiativeResult; mustDo: boolean }) {
 export function InitiativesScreen({
   doc,
   exampleIds,
+  colors,
   horizon,
   onHorizonChange,
   onDelete,
@@ -150,9 +153,12 @@ export function InitiativesScreen({
                 return (
                   <tr key={i.id}>
                     <th scope="row" className="row-head">
-                      <a className="row-name" href={`#edit-${i.id}`}>
-                        {name}
-                      </a>
+                      <span className="row-title">
+                        <span className="swatch" style={{ background: seriesVar(colors[i.id]) }} aria-hidden="true" />
+                        <a className="row-name" href={`#edit-${i.id}`}>
+                          {name}
+                        </a>
+                      </span>
                       <span className="row-moment">
                         {i.consumer_moment ? MOMENT_LABEL[i.consumer_moment] : 'No moment yet'}
                       </span>

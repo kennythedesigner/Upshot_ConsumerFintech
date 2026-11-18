@@ -1,6 +1,6 @@
 /** Brand and the screens you can move between. Plain links, so they work like links. */
 
-export type NavItem = 'initiatives';
+export type NavItem = 'initiatives' | 'compare';
 
 export function TopBar({ current }: { current: NavItem | null }) {
   return (
@@ -13,6 +13,9 @@ export function TopBar({ current }: { current: NavItem | null }) {
       <nav className="nav" aria-label="Screens">
         <a className="nav-link" href="#initiatives" aria-current={current === 'initiatives' ? 'page' : undefined}>
           Initiatives
+        </a>
+        <a className="nav-link" href="#compare" aria-current={current === 'compare' ? 'page' : undefined}>
+          Compare
         </a>
       </nav>
     </header>

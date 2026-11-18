@@ -20,12 +20,14 @@ import { HorizonMotion } from './lib/motion';
 import { HOME, parseHash, sameRoute, toHash, type Route } from './lib/router';
 import {
   loadSession,
+  normalize,
   removeInitiative,
   restoreInitiative,
   saveSession,
   upsertInitiative,
   type Session,
 } from './lib/session';
+import { CompareScreen } from './screens/CompareScreen';
 import { InitiativeScreen } from './screens/InitiativeScreen';
 import { InitiativesScreen } from './screens/InitiativesScreen';
 
@@ -42,7 +44,12 @@ function isHorizon(n: unknown): n is HorizonMonths {
 function seeded(): Session {
   const doc = createPortfolio();
   const [a, b] = workedPair(doc.portfolio.id);
-  return { doc: { ...doc, initiatives: [a, b] }, exampleIds: [a.id, b.id] };
+  return normalize({
+    doc: { ...doc, initiatives: [a, b] },
+    exampleIds: [a.id, b.id],
+    colors: {},
+    compare: { a: a.id, b: b.id },
+  });
 }
 
 interface Opened {
@@ -75,7 +82,9 @@ function boot() {
 
 export default function App() {
   const [initial] = useState(boot);
-  const [session, setSession] = useState(initial.session);
+  const [session, setRawSession] = useState(initial.session);
+  /** Every change to the list goes through normalize, so colours and the compared pair stay valid. */
+  const setSession = (fn: (s: Session) => Session) => setRawSession((s) => normalize(fn(s)));
   const [route, setRoute] = useState(initial.opened.route);
   const [draft, setDraft] = useState<Initiative | null>(initial.opened.draft);
   const [baseline, setBaseline] = useState(initial.opened.draft ? fingerprint(initial.opened.draft) : '');
@@ -204,11 +213,36 @@ export default function App() {
   const loadExample = () => {
     const [a, b] = workedPair(session.doc.portfolio.id);
     setSession((s) => ({
+      ...s,
       doc: { ...s.doc, initiatives: [...s.doc.initiatives, a, b] },
       exampleIds: [...s.exampleIds, a.id, b.id],
+      compare: { a: a.id, b: b.id },
     }));
     setRemoved(null);
   };
+
+  const pick = (slot: 'a' | 'b', id: string) =>
+    setSession((s) => {
+      const other = slot === 'a' ? s.compare.b : s.compare.a;
+      // Picking the initiative already in the other slot swaps them.
+      if (id === other) return { ...s, compare: { a: s.compare.b, b: s.compare.a } };
+      return { ...s, compare: { ...s.compare, [slot]: id } };
+    });
+
+  const swap = () => setSession((s) => ({ ...s, compare: { a: s.compare.b, b: s.compare.a } }));
+
+  // The tab title follows the screen.
+  useEffect(() => {
+    const title =
+      route.screen === 'initiatives'
+        ? 'Initiatives'
+        : route.screen === 'compare'
+          ? 'Compare'
+          : route.screen === 'new' && !draft?.name.trim()
+            ? 'New initiative'
+            : draft?.name.trim() || 'Untitled initiative';
+    document.title = `${title} · Upshot`;
+  }, [route, draft?.name]);
 
   // The unsaved-changes prompt takes focus when it appears, so keyboard and
   // screen-reader users meet it straight away.
@@ -234,7 +268,7 @@ export default function App() {
         </a>
       )}
 
-      <TopBar current={route.screen === 'initiatives' ? 'initiatives' : null} />
+      <TopBar current={route.screen === 'initiatives' ? 'initiatives' : route.screen === 'compare' ? 'compare' : null} />
 
       {pending && (
         <section className="leave-banner" aria-labelledby="leave-title">
@@ -270,10 +304,21 @@ export default function App() {
         </p>
       )}
 
-      {route.screen === 'initiatives' || !draft ? (
+      {route.screen === 'compare' ? (
+        <CompareScreen
+          initiatives={session.doc.initiatives}
+          colors={session.colors}
+          pair={session.compare}
+          horizon={horizon}
+          onHorizonChange={changeHorizon}
+          onPick={pick}
+          onSwap={swap}
+        />
+      ) : route.screen === 'initiatives' || !draft ? (
         <InitiativesScreen
           doc={session.doc}
           exampleIds={session.exampleIds}
+          colors={session.colors}
           horizon={horizon}
           onHorizonChange={changeHorizon}
           onDelete={remove}

@@ -1454,3 +1454,500 @@ ul {
     margin-top: -10px;
   }
 }
+
+/* ── Series swatches: colour says which initiative, nothing more ───────── */
+
+.swatch {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  vertical-align: baseline;
+}
+
+.row-title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.row-title .swatch {
+  transform: translateY(-2px);
+}
+
+/* ── Compare ───────────────────────────────────────────────────────────── */
+
+.compare-page {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--page-x) var(--space-7);
+}
+
+.pickers {
+  display: grid;
+  gap: var(--space-4);
+  align-items: end;
+}
+
+@media (min-width: 720px) {
+  .pickers {
+    grid-template-columns: 1fr 1fr auto;
+  }
+}
+
+.picker-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.picker-meta {
+  margin-top: var(--space-2);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.picker-meta a,
+.compare-status a {
+  color: var(--accent);
+  font-weight: 500;
+  text-underline-offset: 3px;
+}
+
+@media (min-width: 720px) {
+  .pickers .swap {
+    margin-bottom: 28px;
+  }
+}
+
+.compare-note {
+  max-width: 80ch;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-raised);
+  border-left: 2px solid var(--ink-muted);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.compare-status {
+  display: grid;
+  gap: var(--space-2);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-secondary);
+}
+
+.compare-status li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.compare-status strong {
+  color: var(--ink);
+}
+
+.compare-charts {
+  display: grid;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--rule);
+}
+
+.chart-key {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.legend .swatch {
+  transform: translateY(1px);
+}
+
+.encoding-key {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink-secondary);
+}
+
+.key-band {
+  display: inline-block;
+  width: 28px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--ink-muted);
+  opacity: 0.35;
+}
+
+.key-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.encoding-key {
+  column-gap: var(--space-4);
+}
+
+.key-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ink-muted);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.chart-grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (min-width: 1024px) {
+  .chart-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-7);
+  }
+}
+
+.range-chart {
+  margin: 0;
+  min-width: 0;
+}
+
+.range-chart-head {
+  display: grid;
+  gap: 2px;
+  margin-bottom: var(--space-3);
+}
+
+.range-chart-head .section-sub {
+  margin-top: 0;
+}
+
+.range-chart-plot {
+  position: relative;
+}
+
+.range-svg {
+  display: block;
+  overflow: visible;
+}
+
+.range-grid {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.range-zero {
+  stroke: var(--ink-muted);
+  stroke-width: 1;
+}
+
+.range-tick {
+  font-size: 12px;
+  fill: var(--ink-secondary);
+}
+
+.range-letter {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.range-base {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.range-base-label {
+  font-weight: 400;
+  fill: var(--ink-secondary);
+}
+
+.range-note {
+  font-size: 13px;
+  fill: var(--ink-secondary);
+}
+
+.range-band {
+  opacity: 0.35;
+  transition: opacity 120ms ease-out;
+}
+
+.range-dot {
+  stroke: var(--paper);
+  stroke-width: 2;
+}
+
+.range-row.is-active .range-band {
+  opacity: 0.6;
+}
+
+.range-hit {
+  fill: transparent;
+  cursor: default;
+}
+
+.range-hit:focus-visible {
+  outline: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .range-band {
+    transition: none;
+  }
+}
+
+.range-tip {
+  position: absolute;
+  z-index: 2;
+  transform: translateX(-50%);
+  min-width: 180px;
+  padding: var(--space-3);
+  background: var(--paper);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.range-tip-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  color: var(--ink-secondary);
+}
+
+.line-key {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.range-tip-values {
+  display: grid;
+  gap: 2px;
+}
+
+.range-tip-values div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.range-tip-values dt {
+  color: var(--ink-secondary);
+}
+
+.range-tip-values dd {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* The side-by-side table */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.compare-table thead th,
+.compare-table thead td {
+  padding: 0 var(--space-4) var(--space-3) 0;
+  text-align: left;
+  vertical-align: bottom;
+  border-bottom: 1px solid var(--ink-muted);
+}
+
+.compare-table thead td {
+  width: 28%;
+}
+
+.col-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+}
+
+.col-letter {
+  font-weight: 700;
+}
+
+.col-name {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 24px;
+  font-weight: 400;
+  font-optical-sizing: auto;
+}
+
+.compare-table .group-row th {
+  padding: var(--space-5) 0 var(--space-2);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  text-align: left;
+  border-bottom: 1px solid var(--rule);
+}
+
+.compare-table tbody th.row-label,
+.compare-table tbody td {
+  padding: var(--space-3) var(--space-4) var(--space-3) 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.row-label {
+  font-weight: 500;
+}
+
+.row-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--ink-secondary);
+}
+
+.cell-stack {
+  display: grid;
+  gap: 2px;
+}
+
+.cell-stack .tag {
+  margin-left: var(--space-2);
+}
+
+.range-lines {
+  display: grid;
+  gap: 1px;
+}
+
+.range-lines > span {
+  color: var(--ink-secondary);
+}
+
+.range-lines .is-base {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.range-word {
+  display: inline-block;
+  min-width: 3.2em;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-secondary);
+}
+
+.cell-flag {
+  display: block;
+  margin-top: var(--space-1);
+  padding-left: var(--space-2);
+  border-left: 2px solid var(--ink-muted);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-secondary);
+}
+
+/* Narrow screens: the row label spans, A and B sit side by side under it. */
+@media (max-width: 719px) {
+  .compare-table,
+  .compare-table thead,
+  .compare-table tbody {
+    display: block;
+  }
+
+  .compare-table tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .compare-table thead tr {
+    border-bottom: 1px solid var(--ink-muted);
+  }
+
+  .compare-table thead td {
+    display: none;
+  }
+
+  .compare-table thead th,
+  .compare-table tbody th.row-label,
+  .compare-table tbody td,
+  .compare-table .group-row th {
+    border-bottom: 0;
+  }
+
+  .compare-table .group-row {
+    display: block;
+  }
+
+  .compare-table .group-row th {
+    display: block;
+  }
+
+  .compare-table tbody th.row-label {
+    grid-column: 1 / -1;
+    padding-bottom: 0;
+  }
+
+  .compare-table tbody td {
+    padding-top: var(--space-2);
+    font-size: 14px;
+  }
+
+  .col-name {
+    font-size: 16px;
+    line-height: 21px;
+  }
+}
+
+/* On the dark ground a 35% band sinks too far; lift it so the span still reads. */
+@media (prefers-color-scheme: dark) {
+  .range-band {
+    opacity: 0.5;
+  }
+  .range-row.is-active .range-band {
+    opacity: 0.75;
+  }
+}

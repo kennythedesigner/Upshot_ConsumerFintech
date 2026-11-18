@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { workedExample, workedExampleB, workedPair } from '../example';
 import { formatForInput, money, parseNumberInput, percent, signedMoney } from '../numbers';
 import { parseHash, toHash } from '../router';
-import { removeInitiative, restoreInitiative, upsertInitiative } from '../session';
+import { normalize, removeInitiative, restoreInitiative, upsertInitiative } from '../session';
+import { OTHER, assignColors } from '../series';
+import { niceTicks } from '../../components/RangeChart';
 
 describe('reading typed numbers', () => {
   it('accepts the ways people actually type', () => {
@@ -135,5 +137,58 @@ describe('the session list', () => {
     const first = d.initiatives[0]!;
     const back = restoreInitiative(removeInitiative(d, first.id), first, 0);
     expect(back.initiatives.map((i) => i.id)).toEqual(d.initiatives.map((i) => i.id));
+  });
+});
+
+describe('colours follow the initiative, not its place', () => {
+  const docWith = (n: number) => {
+    const d = createPortfolio();
+    const list = Array.from({ length: n }, (_, k) => ({ ...workedExample(d.portfolio.id), id: `i${k}` }));
+    return { ...d, initiatives: list };
+  };
+
+  it('gives the first four their own colours and the rest Other', () => {
+    const c = assignColors(docWith(6), {});
+    expect([c.i0, c.i1, c.i2, c.i3, c.i4, c.i5]).toEqual([0, 1, 2, 3, OTHER, OTHER]);
+  });
+
+  it('keeps survivors’ colours when one is deleted, and hands the freed colour to the next new one', () => {
+    const d = docWith(3);
+    const first = assignColors(d, {});
+    const afterDelete = assignColors({ ...d, initiatives: d.initiatives.filter((i) => i.id !== 'i0') }, first);
+    expect(afterDelete).toEqual({ i1: 1, i2: 2 });
+    const added = { ...d, initiatives: [...d.initiatives.filter((i) => i.id !== 'i0'), { ...d.initiatives[0]!, id: 'new' }] };
+    expect(assignColors(added, afterDelete).new).toBe(0);
+  });
+});
+
+describe('the compared pair', () => {
+  const base = () => {
+    const d = createPortfolio();
+    const [a, b] = workedPair(d.portfolio.id);
+    return { doc: { ...d, initiatives: [a, b] }, exampleIds: [], colors: {}, compare: { a: null, b: null } };
+  };
+
+  it('defaults to the first two, in list order', () => {
+    const s = normalize(base());
+    expect([s.compare.a, s.compare.b]).toEqual(s.doc.initiatives.map((i) => i.id));
+  });
+
+  it('never compares an initiative with itself, and drops a deleted one', () => {
+    const s0 = base();
+    const [a, b] = s0.doc.initiatives;
+    expect(normalize({ ...s0, compare: { a: a!.id, b: a!.id } }).compare).toEqual({ a: a!.id, b: b!.id });
+    const gone = normalize({ ...s0, doc: { ...s0.doc, initiatives: [b!] }, compare: { a: a!.id, b: b!.id } });
+    expect(gone.compare).toEqual({ a: b!.id, b: null });
+  });
+});
+
+describe('chart ticks', () => {
+  it('land on clean numbers and include zero when the range crosses it', () => {
+    const t = niceTicks(-500_000, 3_500_000, 5);
+    expect(t).toContain(0);
+    expect(t.every((v) => v % 500_000 === 0)).toBe(true);
+    expect(t[0]).toBeLessThanOrEqual(-500_000);
+    expect(t.at(-1)).toBeGreaterThanOrEqual(3_500_000);
   });
 });

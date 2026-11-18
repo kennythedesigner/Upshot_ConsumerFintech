@@ -31,10 +31,16 @@ Built so far:
 - **Initiative screen** (`#new`, `#edit-<id>`): all seven input groups, the "Your numbers" panel
   (net value and ROI ranges, the base-case ledger, assumptions), flags, and the empty / incomplete /
   not-live states. Leaving with unsaved changes asks first.
+- **Compare** (`#compare`): any two initiatives side by side (D02). Range charts put both
+  initiatives' net value and ROI (low, base, high) on one axis; the table below covers setup, each
+  value bucket, net value, ROI, ROI spread, total cost, payback, cost of delay, Priority Score,
+  confidence, delivery complexity, pressure patterns, must-do and importance, with flags beside the
+  row they're about. It notes overlapping moments (D36). No row or column is marked as the winner.
 - One horizon slider shared by every screen (D20). A first visit seeds the worked example, A and B
-  (D06). Everything stays in this browser tab's session (D57).
+  (D06). Each initiative keeps one colour on every screen. Everything stays in this browser tab's
+  session (D57).
 
-Next: the A vs B comparison, then the dashboard (totals, map, overlap).
+Next: the dashboard (totals, must-do share, the impact-vs-complexity map, overlap warning).
 
 ```bash
 cd app

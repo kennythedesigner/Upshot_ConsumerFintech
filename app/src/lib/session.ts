@@ -4,13 +4,39 @@
  * (private windows, embedded previews), so every call is guarded.
  */
 import { BUCKET_KINDS, SCHEMA_VERSION, type Initiative, type PortfolioDocument } from '@engine';
+import { assignColors, type ColorMap } from './series';
 
 const KEY = 'upshot.session.v2';
 
-/** What the tab keeps: the portfolio, plus which initiatives are the worked example. */
+/** Which two initiatives the comparison shows. */
+export interface ComparePair {
+  a: string | null;
+  b: string | null;
+}
+
+/** What the tab keeps: the portfolio, which initiatives are the worked example, colours, and the compared pair. */
 export interface Session {
   doc: PortfolioDocument;
   exampleIds: string[];
+  colors: ColorMap;
+  compare: ComparePair;
+}
+
+/**
+ * Keep the parts that depend on the list in step with it: every initiative has
+ * a colour, and the compared pair is two different initiatives that exist.
+ * Falls back to the first two in list order.
+ */
+export function normalize(session: Session): Session {
+  const ids = session.doc.initiatives.map((i) => i.id);
+  const has = (id: string | null): id is string => id !== null && ids.includes(id);
+  let a = has(session.compare.a) ? session.compare.a : null;
+  let b = has(session.compare.b) && session.compare.b !== a ? session.compare.b : null;
+  // Slot A fills first: if only B survived, it moves over to A.
+  if (a === null && b !== null) [a, b] = [b, null];
+  if (a === null) a = ids.find((id) => id !== b) ?? null;
+  if (b === null) b = ids.find((id) => id !== a) ?? null;
+  return { ...session, colors: assignColors(session.doc, session.colors), compare: { a, b } };
 }
 
 function looksLikeInitiative(x: unknown): x is Initiative {
@@ -35,10 +61,16 @@ export function loadSession(): Session | null {
     if (!doc || doc.schema_version !== SCHEMA_VERSION || !doc.portfolio || !Array.isArray(doc.initiatives)) {
       return null;
     }
-    return {
+    const compare = parsed.compare && typeof parsed.compare === 'object' ? parsed.compare : { a: null, b: null };
+    return normalize({
       doc: { ...doc, goals: Array.isArray(doc.goals) ? doc.goals : [], initiatives: doc.initiatives.filter(looksLikeInitiative) },
       exampleIds: Array.isArray(parsed.exampleIds) ? parsed.exampleIds.filter((x) => typeof x === 'string') : [],
-    };
+      colors: parsed.colors && typeof parsed.colors === 'object' ? parsed.colors : {},
+      compare: {
+        a: typeof compare.a === 'string' ? compare.a : null,
+        b: typeof compare.b === 'string' ? compare.b : null,
+      },
+    });
   } catch {
     return null;
   }
