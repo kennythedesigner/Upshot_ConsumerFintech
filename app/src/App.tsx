@@ -1,220 +1,298 @@
 /**
- * The initiative screen: inputs on the left, "Your numbers" pinned on the right.
- * Every figure is recomputed by the engine from the current inputs; nothing on
- * screen is typed in by hand (README: "save inputs, never outputs").
+ * The app shell: which screen is showing, the session's initiatives, the
+ * shared horizon (D20), and the guard that stops unsaved edits being lost.
+ *
+ * Everything persists to this tab's sessionStorage (D57). Screens are plain
+ * #names (see lib/router.ts), so back, forward and bookmarks work.
  */
 import {
   DEFAULT_HORIZON,
   HORIZON_STOPS,
-  calculateInitiative,
   createInitiative,
   createPortfolio,
-  type BucketKind,
   type HorizonMonths,
   type Initiative,
-  type PortfolioDocument,
-  type ValueBucket,
 } from '@engine';
-import { useMemo, useState } from 'react';
-import { HorizonSlider } from './components/HorizonSlider';
-import { InitiativeForm, type GroupId } from './components/InitiativeForm';
-import { ResultsPanel, type FieldTarget } from './components/ResultsPanel';
-import { workedExample } from './lib/example';
+import { useEffect, useRef, useState } from 'react';
+import { TopBar } from './components/TopBar';
+import { workedPair } from './lib/example';
 import { HorizonMotion } from './lib/motion';
-import { latestInitiative, loadSession, saveSession, upsertInitiative } from './lib/session';
+import { HOME, parseHash, sameRoute, toHash, type Route } from './lib/router';
+import {
+  loadSession,
+  removeInitiative,
+  restoreInitiative,
+  saveSession,
+  upsertInitiative,
+  type Session,
+} from './lib/session';
+import { InitiativeScreen } from './screens/InitiativeScreen';
+import { InitiativesScreen } from './screens/InitiativesScreen';
 
-const DEFAULT_OPEN: Record<GroupId, boolean> = {
-  setup: true,
-  volume: true,
-  value: true,
-  cost: true,
-  confidence: true,
-  complexity: false,
-  strategy: false,
-};
+/** Compare drafts by content; the save timestamp alone isn't a change. */
+const fingerprint = (i: Initiative): string => JSON.stringify({ ...i, updated_at: '' });
+
+const isEditor = (r: Route): boolean => r.screen === 'new' || r.screen === 'edit';
 
 function isHorizon(n: unknown): n is HorizonMonths {
   return (HORIZON_STOPS as readonly unknown[]).includes(n);
 }
 
-interface Start {
-  doc: PortfolioDocument;
-  initiative: Initiative;
-  horizon: HorizonMonths;
+/** First visit: seed the worked example, A and B (D06), so every screen has something real on it. */
+function seeded(): Session {
+  const doc = createPortfolio();
+  const [a, b] = workedPair(doc.portfolio.id);
+  return { doc: { ...doc, initiatives: [a, b] }, exampleIds: [a.id, b.id] };
 }
 
-function start(): Start {
-  const saved = loadSession();
-  const doc = saved ?? createPortfolio();
-  const last = saved ? latestInitiative(saved) : null;
-  return {
-    doc,
-    initiative: last ? structuredClone(last) : createInitiative(doc.portfolio.id, ''),
-    horizon: isHorizon(doc.portfolio.horizon_months) ? doc.portfolio.horizon_months : (DEFAULT_HORIZON as HorizonMonths),
-  };
+interface Opened {
+  route: Route;
+  draft: Initiative | null;
+  missing: boolean;
 }
 
-const reducedMotion = (): boolean => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+/** What a route shows, given the session. An unknown id falls back to the list. */
+function open(route: Route, session: Session): Opened {
+  if (route.screen === 'new') {
+    return { route, draft: createInitiative(session.doc.portfolio.id, ''), missing: false };
+  }
+  if (route.screen === 'edit') {
+    const found = session.doc.initiatives.find((i) => i.id === route.id);
+    if (found) return { route, draft: structuredClone(found), missing: false };
+    return { route: HOME, draft: null, missing: true };
+  }
+  return { route, draft: null, missing: false };
+}
+
+function boot() {
+  const session = loadSession() ?? seeded();
+  if (!isHorizon(session.doc.portfolio.horizon_months)) {
+    session.doc.portfolio.horizon_months = DEFAULT_HORIZON as HorizonMonths;
+  }
+  const opened = open(parseHash(window.location.hash), session);
+  return { session, opened };
+}
 
 export default function App() {
-  const [initial] = useState(start);
-  const [doc, setDoc] = useState(initial.doc);
-  const [initiative, setInitiative] = useState(initial.initiative);
-  const [horizon, setHorizon] = useState(initial.horizon);
-  const [open, setOpen] = useState(DEFAULT_OPEN);
-  // Figures count toward new values only when the horizon moved (README, Motion).
-  const [horizonMoved, setHorizonMoved] = useState(false);
-  const [undo, setUndo] = useState<{ previous: Initiative; message: string } | null>(null);
+  const [initial] = useState(boot);
+  const [session, setSession] = useState(initial.session);
+  const [route, setRoute] = useState(initial.opened.route);
+  const [draft, setDraft] = useState<Initiative | null>(initial.opened.draft);
+  const [baseline, setBaseline] = useState(initial.opened.draft ? fingerprint(initial.opened.draft) : '');
+  const [notice, setNotice] = useState<string | null>(
+    initial.opened.missing ? "That initiative isn't in this session any more." : null,
+  );
+  const [pending, setPending] = useState<Route | null>(null);
+  const [removed, setRemoved] = useState<{ initiative: Initiative; index: number } | null>(null);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const [storageOk, setStorageOk] = useState(true);
+  // Figures count toward new values only when the horizon moved (design system, Motion).
+  const [horizonMoved, setHorizonMoved] = useState(false);
 
-  const result = useMemo(() => calculateInitiative(initiative, horizon), [initiative, horizon]);
+  const horizon = session.doc.portfolio.horizon_months;
+  const dirty = draft !== null && fingerprint(draft) !== baseline;
 
-  const edited = () => {
-    setHorizonMoved(false);
-    setUndo(null);
+  // Keep the tab's copy current.
+  useEffect(() => {
+    setStorageOk(saveSession(session));
+  }, [session]);
+
+  /** Show a route. Moves the address bar only when asked; a link click has already moved it. */
+  const show = (to: Route, push: boolean) => {
+    const opened = open(to, session);
+    setRoute(opened.route);
+    setDraft(opened.draft);
+    setBaseline(opened.draft ? fingerprint(opened.draft) : '');
+    setNotice(opened.missing ? "That initiative isn't in this session any more." : null);
+    setPending(null);
     setSaveStatus(null);
-  };
-
-  const update = (patch: Partial<Initiative>) => {
-    setInitiative((prev) => ({ ...prev, ...patch }));
-    edited();
-  };
-
-  const updateBucket = (kind: BucketKind, patch: Partial<ValueBucket>) => {
-    setInitiative((prev) => ({
-      ...prev,
-      buckets: { ...prev.buckets, [kind]: { ...prev.buckets[kind], ...patch } },
-    }));
-    edited();
-  };
-
-  const replaceInitiative = (next: Initiative, message: string) => {
-    setUndo({ previous: initiative, message });
-    setInitiative(next);
     setHorizonMoved(false);
-    setSaveStatus(null);
+    if (opened.route.screen !== 'initiatives') setRemoved(null);
+    const hash = toHash(opened.route);
+    if (push && window.location.hash !== hash) window.history.pushState(null, '', hash);
+    else if (opened.missing) window.history.replaceState(null, '', hash);
+    window.scrollTo({ top: 0 });
   };
 
-  const loadExample = () => replaceInitiative(workedExample(doc.portfolio.id), 'Worked example loaded.');
-  const clearInputs = () => replaceInitiative(createInitiative(doc.portfolio.id, ''), 'Inputs cleared.');
+  // Links, back and forward all arrive here. Leaving an editor with unsaved
+  // changes puts the editor back in the address bar and asks first.
+  const latest = useRef({ route, dirty, show });
+  latest.current = { route, dirty, show };
+  useEffect(() => {
+    const onHash = () => {
+      const { route: current, dirty: unsaved, show: go } = latest.current;
+      const next = parseHash(window.location.hash);
+      if (sameRoute(next, current)) return;
+      if (isEditor(current) && unsaved) {
+        window.history.replaceState(null, '', toHash(current));
+        setPending(next);
+        return;
+      }
+      go(next, false);
+    };
+    // A link click is caught before it moves the address bar, so asking first
+    // leaves history clean. Back and forward can only be caught after (above).
+    const onClick = (e: MouseEvent) => {
+      const { route: current, dirty: unsaved } = latest.current;
+      if (!isEditor(current) || !unsaved || e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const link = (e.target as Element | null)?.closest?.('a[href^="#"]');
+      if (!link) return;
+      const href = link.getAttribute('href') ?? '';
+      if (href === '#results') return;
+      const next = parseHash(href);
+      if (sameRoute(next, current)) return;
+      e.preventDefault();
+      setPending(next);
+    };
+    window.addEventListener('hashchange', onHash);
+    document.addEventListener('click', onClick, true);
+    return () => {
+      window.removeEventListener('hashchange', onHash);
+      document.removeEventListener('click', onClick, true);
+    };
+  }, []);
+
+  // Closing or reloading the tab with unsaved changes gets the browser's own warning.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty]);
 
   const changeHorizon = (h: HorizonMonths) => {
-    setHorizon(h);
+    setSession((s) => ({ ...s, doc: { ...s.doc, portfolio: { ...s.doc.portfolio, horizon_months: h } } }));
     setHorizonMoved(true);
+  };
+
+  const changeDraft = (next: Initiative) => {
+    setDraft(next);
+    setHorizonMoved(false);
     setSaveStatus(null);
   };
 
   const save = () => {
+    if (!draft) return;
     const stamp = new Date().toISOString();
-    const stamped: Initiative = { ...initiative, updated_at: stamp };
-    const next = upsertInitiative(
-      { ...doc, portfolio: { ...doc.portfolio, horizon_months: horizon, updated_at: stamp } },
-      stamped,
-    );
-    const ok = saveSession(next);
-    setDoc(next);
-    setInitiative(stamped);
-    setSaveStatus(ok ? 'Saved for this session' : "Couldn't save in this browser. Your inputs are still here.");
+    const stamped: Initiative = { ...draft, updated_at: stamp };
+    setSession((s) => ({ ...s, doc: upsertInitiative(s.doc, stamped) }));
+    setDraft(stamped);
+    setBaseline(fingerprint(stamped));
+    if (route.screen === 'new') {
+      const editing: Route = { screen: 'edit', id: stamped.id };
+      window.history.replaceState(null, '', toHash(editing));
+      setRoute(editing);
+    }
+    setSaveStatus('Saved for this session');
   };
 
-  /** Open the group, then move focus to the field, so flags and missing items are one click from a fix. */
-  const goTo = ({ group, field }: FieldTarget) => {
-    setOpen((o) => ({ ...o, [group]: true }));
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        const el = document.getElementById(field);
-        if (!el) return;
-        el.scrollIntoView({ block: 'center', behavior: reducedMotion() ? 'auto' : 'smooth' });
-        el.focus({ preventScroll: true });
-      }),
-    );
+  const remove = (id: string) => {
+    const index = session.doc.initiatives.findIndex((i) => i.id === id);
+    const initiative = session.doc.initiatives[index];
+    if (!initiative) return;
+    setSession((s) => ({ ...s, doc: removeInitiative(s.doc, id) }));
+    setRemoved({ initiative, index });
   };
+
+  const undoRemove = () => {
+    if (!removed) return;
+    setSession((s) => ({ ...s, doc: restoreInitiative(s.doc, removed.initiative, removed.index) }));
+    setRemoved(null);
+  };
+
+  const loadExample = () => {
+    const [a, b] = workedPair(session.doc.portfolio.id);
+    setSession((s) => ({
+      doc: { ...s.doc, initiatives: [...s.doc.initiatives, a, b] },
+      exampleIds: [...s.exampleIds, a.id, b.id],
+    }));
+    setRemoved(null);
+  };
+
+  // The unsaved-changes prompt takes focus when it appears, so keyboard and
+  // screen-reader users meet it straight away.
+  const leaveRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (pending) leaveRef.current?.focus();
+  }, [pending]);
+
+  const draftName = draft?.name.trim() || 'this initiative';
 
   return (
     <HorizonMotion.Provider value={horizonMoved}>
-      <a className="skip-link" href="#results">
-        Skip to your numbers
-      </a>
+      {isEditor(route) && (
+        <a
+          className="skip-link"
+          href="#results"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById('results')?.focus();
+          }}
+        >
+          Skip to your numbers
+        </a>
+      )}
 
-      <header className="topbar">
-        <div className="brand">
-          <span className="wordmark" aria-label="Upshot">
-            upshot
-          </span>
-          <span className="brand-sep" aria-hidden="true" />
-          <span className="brand-desc">UX ROI calculator</span>
-        </div>
-      </header>
+      <TopBar current={route.screen === 'initiatives' ? 'initiatives' : null} />
 
-      <div className="page-head">
-        <div className="title-block">
-          <h1 className="page-title">New initiative</h1>
-          <p className="page-subtitle">Turn your UX assumptions into a business case.</p>
-        </div>
-        <HorizonSlider value={horizon} onChange={changeHorizon} />
-        <div className="save-block">
-          <button type="button" className="button button--primary" onClick={save}>
-            Save initiative
-          </button>
-          <p className="save-status" role="status">
-            {saveStatus}
-          </p>
-        </div>
-      </div>
-
-      <main className="workspace">
-        <section className="assumptions" aria-labelledby="assumptions-title">
-          <div className="assumptions-head">
-            <h2 className="eyebrow-title" id="assumptions-title">
-              Initiative assumptions
-            </h2>
-            <div className="toolbar">
-              {undo ? (
-                <p className="toolbar-status" role="status">
-                  {undo.message}{' '}
-                  <button
-                    type="button"
-                    className="text-button"
-                    onClick={() => {
-                      setInitiative(undo.previous);
-                      setUndo(null);
-                    }}
-                  >
-                    Undo
-                  </button>
-                </p>
-              ) : (
-                <>
-                  <button type="button" className="text-button" onClick={loadExample}>
-                    Load the worked example
-                  </button>
-                  <button type="button" className="text-button" onClick={clearInputs}>
-                    Clear inputs
-                  </button>
-                </>
-              )}
-            </div>
+      {pending && (
+        <section className="leave-banner" aria-labelledby="leave-title">
+          <h2 className="leave-title" id="leave-title" tabIndex={-1} ref={leaveRef}>
+            You have unsaved changes to {draftName}.
+          </h2>
+          <div className="leave-actions">
+            <button
+              type="button"
+              className="button button--primary"
+              onClick={() => {
+                const to = pending;
+                save();
+                show(to, true);
+              }}
+            >
+              Save and leave
+            </button>
+            <button type="button" className="button button--secondary" onClick={() => show(pending, true)}>
+              Leave without saving
+            </button>
+            <button type="button" className="text-button" onClick={() => setPending(null)}>
+              Keep editing
+            </button>
           </div>
-          <InitiativeForm
-            key={initiative.id}
-            initiative={initiative}
-            open={open}
-            onToggle={(id) => setOpen((o) => ({ ...o, [id]: !o[id] }))}
-            onUpdate={update}
-            onUpdateBucket={updateBucket}
-          />
         </section>
+      )}
 
-        <aside className="results" id="results" tabIndex={-1} aria-label="Your numbers">
-          <ResultsPanel
-            initiative={initiative}
-            result={result}
-            horizon={horizon}
-            onGo={goTo}
-            onLoadExample={loadExample}
-          />
-        </aside>
-      </main>
+      {(notice || !storageOk) && (
+        <p className="app-notice" role="status">
+          {notice}
+          {!storageOk && " This browser isn't keeping your work, so it will be gone when you close the tab."}
+        </p>
+      )}
+
+      {route.screen === 'initiatives' || !draft ? (
+        <InitiativesScreen
+          doc={session.doc}
+          exampleIds={session.exampleIds}
+          horizon={horizon}
+          onHorizonChange={changeHorizon}
+          onDelete={remove}
+          onLoadExample={loadExample}
+          removed={removed ? { name: removed.initiative.name.trim() || 'Untitled initiative' } : null}
+          onUndoRemove={undoRemove}
+        />
+      ) : (
+        <InitiativeScreen
+          draft={draft}
+          isNew={route.screen === 'new'}
+          dirty={dirty}
+          horizon={horizon}
+          onHorizonChange={changeHorizon}
+          onChange={changeDraft}
+          onSave={save}
+          saveStatus={saveStatus}
+        />
+      )}
     </HorizonMotion.Provider>
   );
 }

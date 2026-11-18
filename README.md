@@ -24,9 +24,17 @@ The screens, in plain React, styled with the Upshot design system. The app impor
 source from `src/engine`, so the screens and `dist/upshot-engine.js` share one copy of the math.
 Nothing on screen is hardcoded: every figure is recalculated from the inputs.
 
-Built so far: the **initiative screen** — all seven input groups, the horizon slider, the
-"Your numbers" panel (net value and ROI ranges, the base-case ledger, assumptions), flags, and the
-empty / incomplete / not-live states. Saved initiatives stay in this browser tab's session (D57).
+Built so far:
+
+- **Initiatives** (`#initiatives`, home): every initiative in the session with its base-case net
+  value and ROI at the shared horizon, in the order added. Delete with undo; empty state.
+- **Initiative screen** (`#new`, `#edit-<id>`): all seven input groups, the "Your numbers" panel
+  (net value and ROI ranges, the base-case ledger, assumptions), flags, and the empty / incomplete /
+  not-live states. Leaving with unsaved changes asks first.
+- One horizon slider shared by every screen (D20). A first visit seeds the worked example, A and B
+  (D06). Everything stays in this browser tab's session (D57).
+
+Next: the A vs B comparison, then the dashboard (totals, map, overlap).
 
 ```bash
 cd app

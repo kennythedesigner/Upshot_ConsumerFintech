@@ -119,6 +119,11 @@ ul {
 /* ── Top bar and page head ─────────────────────────────────────────────── */
 
 .topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
   padding: var(--space-5) var(--page-x) 0;
 }
 
@@ -126,6 +131,82 @@ ul {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-5);
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink-secondary);
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-link:hover {
+  color: var(--ink);
+}
+
+.nav-link[aria-current='page'] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.back-link {
+  margin-bottom: var(--space-2);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.back-link a {
+  color: var(--accent);
+  font-weight: 500;
+  text-underline-offset: 3px;
+}
+
+/* Unsaved changes: a raised strip under the top bar, never a browser dialog. */
+.leave-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  margin: var(--space-4) var(--page-x) 0;
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-raised);
+  border-radius: var(--radius-lg);
+}
+
+.leave-title {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.leave-title:focus {
+  outline: none;
+}
+
+.leave-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+}
+
+.app-notice {
+  margin: var(--space-4) var(--page-x) 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-secondary);
 }
 
 .wordmark {
@@ -196,6 +277,7 @@ ul {
 /* ── Buttons ───────────────────────────────────────────────────────────── */
 
 .button {
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1152,5 +1234,223 @@ ul {
   .page-title {
     font-size: 28px;
     line-height: 34px;
+  }
+}
+
+/* ── Initiatives list ──────────────────────────────────────────────────── */
+
+.list-page {
+  padding: var(--space-6) var(--page-x) var(--space-7);
+}
+
+.list-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--rule);
+}
+
+.example-note {
+  max-width: 72ch;
+  margin-top: var(--space-4);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-secondary);
+}
+
+.list-empty {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 60ch;
+  padding: var(--space-6) 0;
+}
+
+.list-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.initiative-table {
+  width: 100%;
+  margin-top: var(--space-4);
+  border-collapse: collapse;
+}
+
+.initiative-table th,
+.initiative-table td {
+  padding: var(--space-4) var(--space-4) var(--space-4) 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+}
+
+.initiative-table thead th {
+  padding-top: 0;
+  padding-bottom: var(--space-3);
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-secondary);
+}
+
+.initiative-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.initiative-table th:nth-child(4),
+.initiative-table td:nth-child(4) {
+  padding-left: var(--space-5);
+}
+
+.th-sub {
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--ink-muted);
+}
+
+.row-head {
+  font-weight: 400;
+}
+
+.row-name {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 20px;
+  line-height: 26px;
+  font-optical-sizing: auto;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+
+.row-name:hover {
+  text-decoration-color: var(--ink);
+}
+
+.row-moment {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-secondary);
+}
+
+.initiative-table td.num {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 500;
+}
+
+.cell-note {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink-secondary);
+}
+
+.row-notes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--ink-secondary);
+}
+
+.row-actions {
+  text-align: right;
+  width: 1%;
+  padding-right: 0 !important;
+}
+
+.row-actions .text-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: -10px;
+  font-size: 14px;
+}
+
+/* Narrow screens: each initiative becomes a block, figures labelled inline. */
+@media (max-width: 719px) {
+  .initiative-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .initiative-table,
+  .initiative-table tbody,
+  .initiative-table tr,
+  .initiative-table th,
+  .initiative-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .initiative-table tr {
+    position: relative;
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .initiative-table th,
+  .initiative-table td {
+    padding: 0;
+    border: 0;
+  }
+
+  .initiative-table .row-head {
+    padding-right: 72px;
+    margin-bottom: var(--space-3);
+  }
+
+  .initiative-table td[data-label] {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: 4px 0;
+    text-align: right;
+  }
+
+  .initiative-table td[data-label]::before {
+    content: attr(data-label);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink-secondary);
+    text-align: left;
+  }
+
+  .initiative-table td.num {
+    font-size: 16px;
+  }
+
+  .initiative-table .row-notes {
+    justify-content: flex-end;
+  }
+
+  .initiative-table .row-actions {
+    position: absolute;
+    top: var(--space-4);
+    right: 0;
+    width: auto;
+    text-align: right;
+  }
+
+  .row-actions .text-button {
+    margin-top: -10px;
   }
 }

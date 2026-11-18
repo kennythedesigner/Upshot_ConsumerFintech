@@ -1,7 +1,9 @@
-import { calculateInitiative } from '@engine';
+import { calculateInitiative, createPortfolio } from '@engine';
 import { describe, expect, it } from 'vitest';
-import { workedExample } from '../example';
+import { workedExample, workedExampleB, workedPair } from '../example';
 import { formatForInput, money, parseNumberInput, percent, signedMoney } from '../numbers';
+import { parseHash, toHash } from '../router';
+import { removeInitiative, restoreInitiative, upsertInitiative } from '../session';
 
 describe('reading typed numbers', () => {
   it('accepts the ways people actually type', () => {
@@ -70,5 +72,68 @@ describe('the worked example', () => {
     const kinds = (h: number) => at(h).flags.map((f) => f.kind);
     expect(kinds(3)).toEqual(['pressure_note']);
     expect(kinds(12)).toContain('optimistic');
+  });
+});
+
+describe('initiative B, the premium-upgrade prompt', () => {
+  const b = () => calculateInitiative(workedExampleB('p'), 12);
+
+  it('reaches results, with Cost saved left unused', () => {
+    const r = b();
+    expect(r.state.kind).toBe('results');
+    expect(r.metrics!.buckets.saved).toBeUndefined();
+  });
+
+  it('matches hand-worked 12-month figures: one month to go live, run cost included', () => {
+    const m = b().metrics!;
+    // 120,000 × 1.5% × $24 + 120,000 × 0.8% × $60 = 43,200 + 57,600
+    expect(m.monthlyImpact.expected).toBeCloseTo(100_800);
+    expect(m.liveMonths).toBe(11);
+    expect(m.totalCost).toBeCloseTo(90_000 + 1_500 * 11);
+    expect(m.impact.expected - m.totalCost).toBeCloseTo(1_002_300);
+    expect(m.roiPct!.expected).toBeCloseTo(941.1, 1);
+  });
+
+  it('lands near A on ROI but differs on confidence and pressure', () => {
+    const kinds = b().flags.map((f) => f.kind);
+    expect(kinds).toEqual(expect.arrayContaining(['pressure_note', 'speculative', 'optimistic']));
+    expect(b().pressure.label).toBe('pressure');
+  });
+
+  it('is stamped after A, so the list keeps A first', () => {
+    const [a, bb] = workedPair('p');
+    expect(bb.updated_at > a.updated_at).toBe(true);
+  });
+});
+
+describe('routes', () => {
+  it('reads and writes plain #names', () => {
+    expect(parseHash('')).toEqual({ screen: 'initiatives' });
+    expect(parseHash('#new')).toEqual({ screen: 'new' });
+    expect(parseHash('#edit-3f2a-9c')).toEqual({ screen: 'edit', id: '3f2a-9c' });
+    expect(parseHash('#settings')).toEqual({ screen: 'initiatives' });
+    expect(toHash({ screen: 'edit', id: 'abc-1' })).toBe('#edit-abc-1');
+  });
+});
+
+describe('the session list', () => {
+  const doc = () => {
+    const d = createPortfolio();
+    const [a, b] = workedPair(d.portfolio.id);
+    return { ...d, initiatives: [a, b] };
+  };
+
+  it('saving an existing initiative keeps its place', () => {
+    const d = doc();
+    const edited = { ...d.initiatives[0]!, name: 'Renamed' };
+    const next = upsertInitiative(d, edited);
+    expect(next.initiatives.map((i) => i.name)).toEqual(['Renamed', d.initiatives[1]!.name]);
+  });
+
+  it('undo puts a deleted initiative back where it was', () => {
+    const d = doc();
+    const first = d.initiatives[0]!;
+    const back = restoreInitiative(removeInitiative(d, first.id), first, 0);
+    expect(back.initiatives.map((i) => i.id)).toEqual(d.initiatives.map((i) => i.id));
   });
 });

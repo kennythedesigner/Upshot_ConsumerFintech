@@ -5,13 +5,20 @@
  */
 import { BUCKET_KINDS, SCHEMA_VERSION, type Initiative, type PortfolioDocument } from '@engine';
 
-const KEY = 'upshot.session.v1';
+const KEY = 'upshot.session.v2';
+
+/** What the tab keeps: the portfolio, plus which initiatives are the worked example. */
+export interface Session {
+  doc: PortfolioDocument;
+  exampleIds: string[];
+}
 
 function looksLikeInitiative(x: unknown): x is Initiative {
   if (!x || typeof x !== 'object') return false;
   const i = x as Partial<Initiative>;
   return (
     typeof i.id === 'string' &&
+    typeof i.name === 'string' &&
     Array.isArray(i.complexity_factors) &&
     Array.isArray(i.pressure_patterns) &&
     !!i.buckets &&
@@ -19,38 +26,49 @@ function looksLikeInitiative(x: unknown): x is Initiative {
   );
 }
 
-export function loadSession(): PortfolioDocument | null {
+export function loadSession(): Session | null {
   try {
     const raw = window.sessionStorage.getItem(KEY);
     if (!raw) return null;
-    const doc = JSON.parse(raw) as Partial<PortfolioDocument>;
-    if (doc.schema_version !== SCHEMA_VERSION || !doc.portfolio || !Array.isArray(doc.initiatives)) {
+    const parsed = JSON.parse(raw) as Partial<Session>;
+    const doc = parsed.doc;
+    if (!doc || doc.schema_version !== SCHEMA_VERSION || !doc.portfolio || !Array.isArray(doc.initiatives)) {
       return null;
     }
-    return { ...(doc as PortfolioDocument), initiatives: doc.initiatives.filter(looksLikeInitiative) };
+    return {
+      doc: { ...doc, goals: Array.isArray(doc.goals) ? doc.goals : [], initiatives: doc.initiatives.filter(looksLikeInitiative) },
+      exampleIds: Array.isArray(parsed.exampleIds) ? parsed.exampleIds.filter((x) => typeof x === 'string') : [],
+    };
   } catch {
     return null;
   }
 }
 
 /** Returns false when the browser won't store anything. */
-export function saveSession(doc: PortfolioDocument): boolean {
+export function saveSession(session: Session): boolean {
   try {
-    window.sessionStorage.setItem(KEY, JSON.stringify(doc));
+    window.sessionStorage.setItem(KEY, JSON.stringify(session));
     return true;
   } catch {
     return false;
   }
 }
 
-/** Insert or replace one initiative, newest last. */
+/** Insert or replace one initiative, keeping its place in the list. */
 export function upsertInitiative(doc: PortfolioDocument, initiative: Initiative): PortfolioDocument {
-  const others = doc.initiatives.filter((i) => i.id !== initiative.id);
-  return { ...doc, initiatives: [...others, initiative] };
+  const at = doc.initiatives.findIndex((i) => i.id === initiative.id);
+  const initiatives =
+    at === -1 ? [...doc.initiatives, initiative] : doc.initiatives.map((i, n) => (n === at ? initiative : i));
+  return { ...doc, initiatives };
 }
 
-/** The most recently saved initiative, if any. */
-export function latestInitiative(doc: PortfolioDocument): Initiative | null {
-  const sorted = [...doc.initiatives].sort((a, b) => a.updated_at.localeCompare(b.updated_at));
-  return sorted.at(-1) ?? null;
+export function removeInitiative(doc: PortfolioDocument, id: string): PortfolioDocument {
+  return { ...doc, initiatives: doc.initiatives.filter((i) => i.id !== id) };
+}
+
+/** Put an initiative back where it was, for Undo. */
+export function restoreInitiative(doc: PortfolioDocument, initiative: Initiative, index: number): PortfolioDocument {
+  const initiatives = [...doc.initiatives];
+  initiatives.splice(Math.min(index, initiatives.length), 0, initiative);
+  return { ...doc, initiatives };
 }

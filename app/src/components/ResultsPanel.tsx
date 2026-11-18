@@ -259,10 +259,9 @@ interface ResultsPanelProps {
   result: InitiativeResult;
   horizon: number;
   onGo: (target: FieldTarget) => void;
-  onLoadExample: () => void;
 }
 
-export function ResultsPanel({ initiative, result, horizon, onGo, onLoadExample }: ResultsPanelProps) {
+export function ResultsPanel({ initiative, result, horizon, onGo }: ResultsPanelProps) {
   const { state, metrics, flags } = result;
   const confidence = initiative.confidence;
 
@@ -288,12 +287,9 @@ export function ResultsPanel({ initiative, result, horizon, onGo, onLoadExample 
           <section className="panel-section panel-state">
             <p className="state-lead">{STATE_COPY.empty}.</p>
             <p className="panel-text">
-              Your numbers fill in here as you go. To see a finished one first, load the worked example: a
-              neobank's fee and overdraft transparency redesign.
+              Your numbers fill in here as you go. Moment, consumers per month, one value row, build cost and
+              confidence are all it takes.
             </p>
-            <button type="button" className="button button--secondary" onClick={onLoadExample}>
-              Load the worked example
-            </button>
           </section>
         )}
 
