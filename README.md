@@ -138,7 +138,7 @@ who still have their session; the sweep covers everyone else.
 - Goal / OKR subtotals on the dashboard
 - The Vercel project for `app/` (root directory `app`, domain app.upshotpm.app)
 - Welcome and Onboarding screens in the app, wired to the Supabase save (D52, D53b)
-- Worked example A's sourced inputs (D63, open). B's are sourced: see
+- Worked example A's sourced inputs (D64, open). B's are sourced: see
   [docs/worked-example-sources.md](docs/worked-example-sources.md)
 - E2E flow tests (checklist section 2)
 - The "Delete my saved data" control (the function behind it is live)

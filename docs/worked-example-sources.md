@@ -9,7 +9,7 @@ The bank is made up, so its size (consumers a month) and its timelines are state
 
 How the engine reads an input: each month, consumers × lift (points out of 100) × dollars per affected consumer = that month's impact for the bucket (D09, D13).
 
-## B. Premium-upgrade prompt (sourced 2026-11-19, D62)
+## B. Premium-upgrade prompt (sourced 2026-11-19, D63)
 
 | Input | Value | Type | Basis |
 |---|---|---|---|
@@ -28,7 +28,7 @@ Cross-check: across subscription apps, freemium apps convert a median 2.2% of do
 
 Result at 12 months: net value $113,000, ROI 105% (−49% to 259%), payback 5.9 months.
 
-## A. Fee and overdraft transparency redesign (open, D63)
+## A. Fee and overdraft transparency redesign (open, D64)
 
 A's inputs still come from the Upshot V1 wireframe. A sourcing pass is under review: the fee revenue given up looks much larger than the wireframe assumes, and A's result depends on what overdraft fee the fictional bank charges.
 
