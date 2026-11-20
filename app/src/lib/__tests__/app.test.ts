@@ -89,17 +89,20 @@ describe('initiative B, the premium-upgrade prompt', () => {
 
   it('matches hand-worked 12-month figures: one month to go live, run cost included', () => {
     const m = b().metrics!;
-    // 120,000 × 1.5% × $24 + 120,000 × 0.8% × $60 = 43,200 + 57,600
-    expect(m.monthlyImpact.expected).toBeCloseTo(100_800);
+    // 120,000 × 0.3% × $30 + 120,000 × 0.03% × $257 = 10,800 + 9,252
+    expect(m.monthlyImpact.expected).toBeCloseTo(20_052);
     expect(m.liveMonths).toBe(11);
-    expect(m.totalCost).toBeCloseTo(90_000 + 1_500 * 11);
-    expect(m.impact.expected - m.totalCost).toBeCloseTo(1_002_300);
-    expect(m.roiPct!.expected).toBeCloseTo(941.1, 1);
+    expect(m.totalCost).toBeCloseTo(90_000 + 1_600 * 11);
+    // 220,572 − 107,600
+    expect(m.impact.expected - m.totalCost).toBeCloseTo(112_972);
+    expect(m.roiPct!.expected).toBeCloseTo(104.99, 1);
+    // Low confidence: the worst case loses money.
+    expect(m.roiPct!.low).toBeLessThan(0);
   });
 
-  it('lands near A on ROI but differs on confidence and pressure', () => {
+  it('flags speculative evidence and its pressure patterns', () => {
     const kinds = b().flags.map((f) => f.kind);
-    expect(kinds).toEqual(expect.arrayContaining(['pressure_note', 'speculative', 'optimistic']));
+    expect(kinds).toEqual(expect.arrayContaining(['pressure_note', 'speculative']));
     expect(b().pressure.label).toBe('pressure');
   });
 
@@ -204,13 +207,13 @@ describe('the dashboard', () => {
 
   it('adds base cases only, matching the hand math at 12 months', () => {
     const p = calculatePortfolio(twelve());
-    // A: 2,427,840 expected, 240,000 cost. B: 1,108,800 expected, 90,000 + 11 × 1,500 = 106,500 cost.
-    expect(p.totals.expectedImpact).toBeCloseTo(3_536_640, 2);
-    expect(p.totals.totalCost).toBe(346_500);
+    // A: 2,427,840 expected, 240,000 cost. B: 220,572 expected, 90,000 + 11 × 1,600 = 107,600 cost.
+    expect(p.totals.expectedImpact).toBeCloseTo(2_648_412, 2);
+    expect(p.totals.totalCost).toBe(347_600);
     // Weighted: A at medium (0.6) + B at low (0.3).
-    expect(p.totals.confidenceWeightedImpact).toBeCloseTo(2_427_840 * 0.6 + 1_108_800 * 0.3, 2);
-    // (3,536,640 − 346,500) ÷ 346,500.
-    expect(p.totals.roiPct).toBeCloseTo(920.675, 2);
+    expect(p.totals.confidenceWeightedImpact).toBeCloseTo(2_427_840 * 0.6 + 220_572 * 0.3, 2);
+    // (2,648,412 − 347,600) ÷ 347,600.
+    expect(p.totals.roiPct).toBeCloseTo(661.91, 1);
     expect(p.notCounted).toEqual([]);
   });
 
@@ -219,21 +222,22 @@ describe('the dashboard', () => {
     const blank = createInitiative(doc.portfolio.id, 'Half-filled');
     const p = calculatePortfolio({ ...doc, initiatives: [...doc.initiatives, blank] });
     expect(p.notCounted).toEqual([blank.id]);
-    expect(p.totals.totalCost).toBe(346_500);
+    expect(p.totals.totalCost).toBe(347_600);
   });
 
   it('sorts as a lens, keeping rows without figures last', () => {
     const doc = twelve();
     const [a, b] = doc.initiatives;
     const blank = createInitiative(doc.portfolio.id, 'Half-filled');
-    const list = [blank, a!, b!];
+    // Added B first, so every sort has to move A up to pass.
+    const list = [blank, b!, a!];
     const { results } = calculatePortfolio({ ...doc, initiatives: list });
     const order = (key: Parameters<typeof sortInitiatives>[2]) =>
       sortInitiatives(list, results, key).map((i) => i.name);
-    expect(order('added')).toEqual([blank.name, a!.name, b!.name]);
+    expect(order('added')).toEqual([blank.name, b!.name, a!.name]);
     expect(order('net')).toEqual([a!.name, b!.name, blank.name]);
-    expect(order('roi')).toEqual([b!.name, a!.name, blank.name]); // 941% vs 912%
-    expect(order('spread')).toEqual([b!.name, a!.name, blank.name]); // 1,562 vs 1,098 pts
-    expect(order('priority')).toEqual([a!.name, b!.name, blank.name]); // 6.07 vs 3.12
+    expect(order('roi')).toEqual([a!.name, b!.name, blank.name]); // 912% vs 105%
+    expect(order('spread')).toEqual([a!.name, b!.name, blank.name]); // 1,098 vs 307 pts
+    expect(order('priority')).toEqual([a!.name, b!.name, blank.name]); // 6.07 vs 0.61
   });
 });

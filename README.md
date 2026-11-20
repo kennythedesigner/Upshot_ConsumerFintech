@@ -3,10 +3,10 @@
 The math behind **Upshot - a UX ROI calculator** ([upshotpm.app](https://upshotpm.app)).
 It helps a consumer-fintech PM compare two initiatives before either is built, in dollars, with honest ranges. It never names a winner.
 
-This repo holds the **calculation engine** and the **Supabase backend** for Onboarding. It follows decision log rev 24.
+This repo holds the **calculation engine**, the **Supabase backend** for Onboarding, and the **calculator app** (`app/`). It follows decision log rev 25.
 
-- **Hosting (D53a):** the calculator is a Framer code component on upshotpm.app (D47). There is no separate app or subdomain.
-- **Delivery:** `npm run build` makes two ES modules the Framer code component imports: `dist/upshot-engine.js` (the math) and `dist/upshot-data.js` (Onboarding save/load).
+- **Hosting (D53a, rev 25):** the calculator app (`app/`) is hosted on Vercel at app.upshotpm.app. The marketing pages are on Framer at upshotpm.app (D47).
+- **Delivery:** the app imports the engine straight from `src/engine`. `npm run build` at the root still makes the standalone modules `dist/upshot-engine.js` (the math) and `dist/upshot-data.js` (Onboarding save/load).
 - **Database (D53b):** Supabase saves portfolio metadata only (the business goal and the goal/OKR list). Initiatives stay in the session (D57 deferred).
 - **Visitors (D58):** each visitor is a Supabase anonymous user, so row-level security can trust who owns a row. Supabase keeps its sign-in token in the browser; no portfolio data is kept there (D52c).
 
@@ -136,8 +136,10 @@ who still have their session; the sweep covers everyone else.
 ## Not built yet
 
 - Goal / OKR subtotals on the dashboard
-- Where the app is hosted. D53a assumed a Framer code component; `app/` is a standalone React
-  app that can be deployed on its own or embedded
+- The Vercel project for `app/` (root directory `app`, domain app.upshotpm.app)
+- Welcome and Onboarding screens in the app, wired to the Supabase save (D52, D53b)
+- Worked example A's sourced inputs (D63, open). B's are sourced: see
+  [docs/worked-example-sources.md](docs/worked-example-sources.md)
 - E2E flow tests (checklist section 2)
 - The "Delete my saved data" control (the function behind it is live)
 - Privacy policy (inputs now settled: what is stored, 90 days, in-product delete,

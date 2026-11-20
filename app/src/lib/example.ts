@@ -3,9 +3,10 @@
  *   A = Fee and overdraft transparency redesign
  *   B = Premium-upgrade prompt in the app
  *
- * A's figures come from the Upshot V1 wireframe. B's are illustrative,
- * chosen so the pair lands close on ROI but differs on range width and
- * pressure patterns — the comparison the tool exists to show (D02, D35).
+ * A's figures come from the Upshot V1 wireframe. B's come from public
+ * figures, each noted beside its input and listed in docs/worked-example-sources.md.
+ * The bank itself is fictional, so its size (consumers a month) and its
+ * timeline stay stated assumptions.
  */
 import { createInitiative, type Initiative } from '@engine';
 
@@ -42,22 +43,36 @@ export function workedExample(portfolioId: string): Initiative {
 
 /**
  * B. An in-app prompt to upgrade to a paid plan. Revenue now is the first
- * three months of the plan; Retention is the lower churn of paying members.
- * No cost saved, so that bucket is left blank (unused). Benchmark evidence
- * only, so confidence is Low and the range runs wide.
+ * three months of the plan; Retention is the lower churn of the members who
+ * upgrade. No cost saved, so that bucket is left blank (unused). Benchmark
+ * evidence only, so confidence is Low and the range runs wide.
  */
 export function workedExampleB(portfolioId: string): Initiative {
   const i = createInitiative(portfolioId, 'Premium-upgrade prompt in the app');
   i.consumer_moment = 'upgrade_new_product';
+  // Assumption: free-plan members who see the prompt each month. The bank is fictional.
   i.consumers_per_month = 120_000;
 
-  i.buckets.now.lift_pts = 1.5;
-  i.buckets.now.value_per_consumer = 24;
-  i.buckets.later.lift_pts = 0.8;
-  i.buckets.later.value_per_consumer = 60;
+  // Monzo FY2026: subscribers rose from 1m+ to 1.6m+ on 10.4m monthly active users,
+  // about 0.57% of free users a month across every channel, net of cancellations.
+  // One prompt is one channel, so about half: 0.3 points.
+  i.buckets.now.lift_pts = 0.3;
+  // Three months of a US plan: Revolut Premium $9.99/month, SoFi Plus $10/month.
+  i.buckets.now.value_per_consumer = 30;
+  // The weakest input. Digital-bank churn is reported at roughly 12–25% a year; no
+  // public source says how much a paid plan cuts it, so this assumes it halves it
+  // for the 0.3 points who upgrade: 0.3 × ~10% ≈ 0.03 points.
+  i.buckets.later.lift_pts = 0.03;
+  // A year of revenue from a kept member: Chime ARPAM, $257 (Q4 2025).
+  i.buckets.later.value_per_consumer = 257;
 
+  // BLS: software developer median wage $135,980 (May 2025); wages are 70% of
+  // employer cost (ECEC, June 2026), so about $16,200 a developer-month.
+  // $90,000 is about 5½ developer-months.
   i.build_cost = 90_000;
-  i.run_cost_per_month = 1_500;
+  // Upkeep: about 10% of one developer-month.
+  i.run_cost_per_month = 1_600;
+  // Assumption.
   i.months_until_live = 1;
 
   i.confidence = 'low';
