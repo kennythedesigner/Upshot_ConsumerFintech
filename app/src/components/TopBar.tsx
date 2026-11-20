@@ -1,4 +1,5 @@
-/** Brand and the screens you can move between. Plain links, so they work like links. */
+/** Brand, the screens you can move between, and the theme switch (D65). */
+import { ThemeSwitch } from './ThemeSwitch';
 
 export type NavItem = 'dashboard' | 'compare';
 
@@ -18,6 +19,7 @@ export function TopBar({ current }: { current: NavItem | null }) {
           Compare
         </a>
       </nav>
+      <ThemeSwitch />
     </header>
   );
 }

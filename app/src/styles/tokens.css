@@ -1,6 +1,9 @@
 /*
  * Upshot design system tokens (tokens.json, v1), as CSS custom properties.
- * Paper is the primary theme; dark follows the reader's system setting.
+ * Paper is the primary theme. Dark applies when <html data-theme="dark">:
+ * the theme script (src/lib/theme.ts, plus the inline script in
+ * index.html) sets that attribute from the reader's saved choice (D65)
+ * or, with no choice saved, their device setting.
  *
  * One addition: --control-border. The system's `rule` hairline is too light
  * for an input's edge (1.3:1), and its own accessibility rule asks 3:1 for
@@ -43,19 +46,17 @@
   --radius-lg: 12px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
+:root[data-theme='dark'] {
+  color-scheme: dark;
 
-    --paper: #1a1a19;
-    --surface-raised: #242422;
-    --rule: #36352f;
-    --ink: #f4f2ec;
-    --ink-secondary: #b3afa5;
-    --ink-muted: #8b8880;
-    --accent: #4fc9b8;
-    --accent-mark: #00938a;
-    --on-accent: #1a1a19;
-    --series-3: #5a72d6;
-  }
+  --paper: #1a1a19;
+  --surface-raised: #242422;
+  --rule: #36352f;
+  --ink: #f4f2ec;
+  --ink-secondary: #b3afa5;
+  --ink-muted: #8b8880;
+  --accent: #4fc9b8;
+  --accent-mark: #00938a;
+  --on-accent: #1a1a19;
+  --series-3: #5a72d6;
 }

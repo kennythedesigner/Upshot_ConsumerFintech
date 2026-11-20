@@ -1,5 +1,5 @@
 # Runs on every push and pull request (Testing & Security Checklist, section 5).
-# If the math breaks, this fails before anything gets published to Framer.
+# If the math breaks, this fails before anything reaches Vercel.
 name: CI
 
 on:
@@ -41,3 +41,21 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  # The marketing pages (site/): typecheck and build, no test suite yet.
+  site:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+

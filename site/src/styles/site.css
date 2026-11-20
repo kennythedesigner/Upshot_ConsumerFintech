@@ -1,0 +1,711 @@
+/*
+ * The marketing pages. Same rules as the app: group with spacing, not
+ * boxes; serif headings carry the structure; one accent, interactive only;
+ * no shadows, no gradients. Breakpoint at 720px, same as the app.
+ */
+
+/* ── Base ─────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+figure {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: var(--space-3);
+  z-index: 10;
+  padding: var(--space-2) var(--space-4);
+  background: var(--paper);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-md);
+}
+
+.skip-link:focus-visible {
+  left: var(--space-3);
+}
+
+.page {
+  max-width: 1216px;
+  margin: 0 auto;
+  padding: 0 var(--space-6) var(--space-7);
+}
+
+/* ── Type roles (D66: marketing additions; the app's scale is untouched) ── */
+
+.display {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: clamp(38px, 7vw, 56px);
+  line-height: 1.08;
+}
+
+.heading {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: clamp(27px, 4.5vw, 36px);
+  line-height: 1.12;
+}
+
+.eyebrow,
+.kicker {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-secondary);
+}
+
+.lede,
+.section-lede {
+  max-width: 54ch;
+  color: var(--ink-secondary);
+}
+
+.body-line {
+  max-width: 60ch;
+  color: var(--ink-secondary);
+}
+
+.body-line + .body-line {
+  margin-top: var(--space-4);
+}
+
+.text-link {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Buttons and controls ─────────────────────────────────────────────── */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px; /* marketing touch target (D66); the app keeps 44px */
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button--primary {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: var(--on-accent);
+}
+
+.button--primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.button--ghost {
+  background: transparent;
+  border: 1px solid var(--control-border);
+  color: var(--ink);
+}
+
+.button--ghost:hover {
+  background: var(--accent-subtle);
+}
+
+.control {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  background: var(--paper);
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  color: var(--ink);
+}
+
+.control:focus-visible {
+  outline-offset: 0;
+}
+
+/* The one allowed red (D66): a typo in the email field, nothing else. */
+.control--invalid {
+  border-color: var(--error);
+}
+
+.error-text {
+  color: var(--error);
+}
+
+/* ── Theme switch ─────────────────────────────────────────────────────── */
+
+.theme-switch {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--paper);
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+}
+
+.theme-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-secondary);
+  cursor: pointer;
+}
+
+.theme-switch-btn[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* ── Top bar ──────────────────────────────────────────────────────────── */
+
+.topbar {
+  padding-top: var(--space-5);
+}
+
+.topbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+}
+
+.wordmark {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-size: 26px;
+  line-height: 32px;
+}
+
+.brand-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--rule);
+}
+
+.brand-desc {
+  font-size: 15px;
+  color: var(--ink-secondary);
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.top-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.top-link:hover {
+  text-decoration: underline;
+}
+
+.menu-btn {
+  display: none;
+}
+
+.topbar-switch-row {
+  display: none;
+}
+
+.menu {
+  display: none;
+}
+
+@media (max-width: 719px) {
+  .page {
+    padding: 0 var(--space-5) var(--space-7);
+  }
+
+  .top-nav {
+    display: none;
+  }
+
+  .menu-btn {
+    display: inline-flex;
+    min-height: 44px;
+  }
+
+  /* Kennedi's screens put the switch on its own row under the wordmark. */
+  .topbar-switch-row {
+    display: block;
+    margin-top: var(--space-3);
+  }
+
+  .menu {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .menu-link {
+    padding: var(--space-3) 0;
+    color: var(--accent);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .menu-cta {
+    margin-top: var(--space-2);
+  }
+}
+
+/* ── Hero and sections ────────────────────────────────────────────────── */
+
+.hero {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+  padding: clamp(48px, 9vw, 104px) 0 0;
+  max-width: 760px;
+}
+
+.hero--page {
+  gap: var(--space-4);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+  margin-top: clamp(64px, 11vw, 112px);
+}
+
+.legal-section {
+  margin-top: clamp(48px, 8vw, 72px);
+}
+
+/* ── How it works ─────────────────────────────────────────────────────── */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.step {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.step-num {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-size: clamp(28px, 5vw, 32px);
+  line-height: 1.1;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums slashed-zero;
+}
+
+.step-title {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 28px;
+}
+
+.step-body {
+  color: var(--ink-secondary);
+}
+
+@media (max-width: 719px) {
+  .steps {
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+  }
+
+  .step-num {
+    font-size: 44px;
+  }
+}
+
+/* ── Screenshot frame ─────────────────────────────────────────────────── */
+
+.shot {
+  width: 100%;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.shot-frame {
+  display: grid;
+  place-items: center;
+  min-height: clamp(220px, 32vw, 420px);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+
+.shot-caption {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-secondary);
+}
+
+/* ── Is / isn't ───────────────────────────────────────────────────────── */
+
+.two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-7);
+  width: 100%;
+}
+
+.col-title {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 28px;
+  margin-bottom: var(--space-4);
+}
+
+.dot-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-secondary);
+}
+
+.dot-list li {
+  position: relative;
+  padding-left: var(--space-4);
+}
+
+.dot-list li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 719px) {
+  .two-col {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+}
+
+/* ── Pressure patterns ────────────────────────────────────────────────── */
+
+/* A list wearing the app's checkbox clothes: the boxes are decoration,
+ * not inputs — nothing here is tickable on a marketing page. */
+.pattern-list {
+  display: grid;
+  /* Fill down the first column, as designed: rows 1-3 left, 4-6 right. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(3, auto);
+  grid-auto-flow: column;
+  gap: var(--space-4) var(--space-7);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+  max-width: 880px;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.pattern-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.pattern-box {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--control-border);
+  border-radius: 3px;
+}
+
+.pull {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-size: clamp(21px, 3vw, 26px);
+  line-height: 1.4;
+  max-width: 52ch;
+  text-wrap: balance;
+}
+
+@media (max-width: 719px) {
+  .pattern-list {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-auto-flow: row;
+  }
+}
+
+/* ── Signup ───────────────────────────────────────────────────────────── */
+
+.signup {
+  width: 100%;
+  max-width: 560px;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.signup-label {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.signup-row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.signup-row .control {
+  flex: 1;
+}
+
+.signup-status {
+  min-height: 24px;
+}
+
+.signup-note {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 719px) {
+  .signup-row {
+    flex-direction: column;
+  }
+}
+
+/* ── Method page ──────────────────────────────────────────────────────── */
+
+.section--first {
+  margin-top: clamp(40px, 7vw, 64px);
+}
+
+.formula-card {
+  width: 100%;
+  max-width: 880px;
+  padding: var(--space-6);
+  background: var(--surface-raised);
+  border-radius: var(--radius-lg);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.formula {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-size: clamp(21px, 3vw, 27px);
+  line-height: 1.4;
+}
+
+.formula-note {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-secondary);
+}
+
+.assumption-note {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-secondary);
+}
+
+.spread-table {
+  width: 100%;
+  max-width: 640px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums slashed-zero;
+}
+
+.spread-table th {
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 0 0 var(--space-3);
+}
+
+.spread-table td {
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--rule);
+}
+
+.spread-table tbody tr:last-child td {
+  border-bottom: 1px solid var(--rule);
+}
+
+/* ── FAQ ──────────────────────────────────────────────────────────────── */
+
+.faq {
+  width: 100%;
+  max-width: 880px;
+  display: grid;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--rule);
+}
+
+.faq-item:first-child {
+  border-top: 1px solid var(--rule);
+}
+
+.faq-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  color: var(--accent);
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq-q::-webkit-details-marker {
+  display: none;
+}
+
+.faq-mark::before {
+  content: '+';
+  font-size: 20px;
+  color: var(--accent);
+}
+
+.faq-item[open] .faq-mark::before {
+  content: '−';
+}
+
+.faq-a {
+  max-width: 64ch;
+  padding: 0 0 var(--space-5);
+  color: var(--ink-secondary);
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────── */
+
+.footer {
+  margin-top: clamp(72px, 12vw, 128px);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.footer-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.footer-brand {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-size: 24px;
+  line-height: 30px;
+}
+
+.footer-desc {
+  margin-top: var(--space-1);
+  color: var(--ink-secondary);
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer-links li + li::before {
+  content: '·';
+  margin-right: var(--space-4);
+  color: var(--ink-muted);
+}
+
+.fine-print {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-secondary);
+}

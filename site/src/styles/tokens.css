@@ -1,0 +1,63 @@
+/*
+ * Upshot design system tokens — the marketing site's copy.
+ * Light is the primary theme. Dark applies when <html data-theme="dark">,
+ * which the theme script sets from the visitor's saved choice or, failing
+ * that, their device setting (see src/lib/theme.ts and the inline script
+ * in each page's head).
+ *
+ * Additions over the app's token file (D66):
+ *   --accent-subtle  secondary-button hover fill (an interactive state,
+ *                    never a meaning)
+ *   --error          ONE narrow exception to the no-good/bad-colour rule:
+ *                    the invalid-email state on the signup form. Nothing
+ *                    else may use it.
+ * --control-border is ink-muted: the sheets call it border-control, same
+ * value, and `rule` is too light for a 3:1 input edge.
+ */
+:root {
+  color-scheme: light;
+
+  --paper: #fcfcfb;
+  --surface-raised: #f6f5f2;
+  --rule: #e4e2dc;
+  --ink: #1a1a19;
+  --ink-secondary: #56544e;
+  --ink-muted: #86837a;
+  --accent: #00605a;
+  --accent-hover: #00504b;
+  --accent-subtle: #e4f2ed;
+  --on-accent: #fcfcfb;
+  --control-border: var(--ink-muted);
+  --error: #b3261e;
+
+  --font-serif: 'Newsreader Variable', Newsreader, Georgia, serif;
+  --font-sans: 'Public Sans Variable', 'Public Sans', system-ui, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --paper: #1a1a19;
+  --surface-raised: #242422;
+  --rule: #36352f;
+  --ink: #f4f2ec;
+  --ink-secondary: #b3afa5;
+  --ink-muted: #8b8880;
+  --accent: #4fc9b8;
+  --accent-hover: #6ad2c3;
+  --accent-subtle: #1f2e2a;
+  --on-accent: #1a1a19;
+  --error: #e08477;
+}

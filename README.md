@@ -5,7 +5,7 @@ It helps a consumer-fintech PM compare two initiatives before either is built, i
 
 This repo holds the **calculation engine**, the **Supabase backend** for Onboarding, and the **calculator app** (`app/`). It follows decision log rev 25.
 
-- **Hosting (D53a, rev 25):** the calculator app (`app/`) is hosted on Vercel at app.upshotpm.app. The marketing pages are on Framer at upshotpm.app (D47).
+- **Hosting (D53a, rev 27):** two Vercel projects from this one repo. The marketing pages (`site/`) live at upshotpm.app; the calculator app (`app/`) lives at app.upshotpm.app. No Framer.
 - **Delivery:** the app imports the engine straight from `src/engine`. `npm run build` at the root still makes the standalone modules `dist/upshot-engine.js` (the math) and `dist/upshot-data.js` (Onboarding save/load).
 - **Database (D53b):** Supabase saves portfolio metadata only (the business goal and the goal/OKR list). Initiatives stay in the session (D57 deferred).
 - **Visitors (D58):** each visitor is a Supabase anonymous user, so row-level security can trust who owns a row. Supabase keeps its sign-in token in the browser; no portfolio data is kept there (D52c).
@@ -17,6 +17,18 @@ npm install      # once
 npm test         # engine, data layer, and RLS tests (runs the real migration in PGlite)
 npm run check    # type-check + tests + build (what CI runs)
 ```
+
+## The marketing site (`site/`)
+
+Four pages — Home, Method, Privacy and Terms — built in plain React from
+Kennedi's Figma Make screens: Vite, no router (each page is its own HTML
+file; Vercel's cleanUrls serves `/method.html` as `/method`). Light and
+dark follow the design system; a two-position theme switch (D65) stores
+the choice in localStorage plus a one-word `upshot_theme` cookie on
+.upshotpm.app, so the site and the calculator stay in step. First visit
+follows the device. The signup form validates (the invalid-email state
+is the system's one allowed red, D66) but has no destination yet — pick
+one before launch. Run it with `cd site && npm ci && npm run dev`.
 
 ## The calculator app (`app/`)
 
@@ -75,6 +87,7 @@ src/data/
   clean.ts        # cleans and checks Onboarding text before saving (checklist 3)
   portfolioMeta.ts  # anonymous session, load/save Onboarding, plain-language errors
 app/              # the calculator screens (React); imports src/engine
+site/             # the marketing pages (React): Home, Method, Privacy, Terms
 supabase/
   migrations/     # tables, RLS policies, save_onboarding, retention functions
   jobs/           # run-once operational SQL (the retention cron job)

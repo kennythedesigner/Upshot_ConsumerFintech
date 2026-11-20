@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Upshot — a UX ROI calculator</title>
+    <meta name="description" content="Upshot compares consumer-fintech initiatives before they're built, in dollars, with honest ranges. It never names a winner." />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      // Set the theme before first paint: the visitor's saved choice (a cookie
+      // shared across upshotpm.app, else this site's own storage), falling back
+      // to their device setting. The full logic lives in src/lib/theme.ts.
+      (function () {
+        try {
+          var m = document.cookie.match(/(?:^|; )upshot_theme=(light|dark)(?:;|$)/);
+          var t = m ? m[1] : localStorage.getItem('upshot.theme');
+          if (t !== 'light' && t !== 'dark') {
+            t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          document.documentElement.dataset.theme = t;
+        } catch (e) {
+          /* tokens.css defaults to light */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/entries/home.tsx"></script>
+  </body>
+</html>
