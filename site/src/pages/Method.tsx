@@ -23,7 +23,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: 'Is my data saved?',
-    a: 'Your initiatives and their results stay in your browser tab and clear when you close it. The only things saved are your business goal and goal list, under an anonymous ID, deleted 90 days after you last saved. The Privacy page has the details.',
+    a: 'Your initiatives and their results stay in your browser tab and clear when you close it. Upshot doesn’t store your work on a server today, and there are no accounts. The Privacy page has the details.',
   },
 ];
 

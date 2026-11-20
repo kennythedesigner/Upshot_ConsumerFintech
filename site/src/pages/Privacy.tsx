@@ -1,34 +1,44 @@
 /**
- * Privacy, from Kennedi's screens, still marked a draft. Filled in since
- * the design: the Supabase region, and a Theme section for the D65
- * preference cookie (new — flagged to Kennedi). Two sections describe
- * parts of the app that are not built yet (Onboarding's save, the delete
- * control); that stays on her open list for launch.
+ * Privacy. Copy deck rev 2, applied 2026-11-20.
+ *
+ * Kennedi chose: describe what is true TODAY, and rewrite when Onboarding
+ * ships. So the calculator stores nothing on a server — but a signup address
+ * does, now that the form is wired (D52a), and these sections say both.
+ *
+ * Removal is by email until the in-app delete control is built, which makes
+ * the contact address a launch blocker, not a nicety. It is still a
+ * placeholder below.
  */
 const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: 'Saved',
-    body: ['Your business goal, your goal list and an anonymous sign-in ID. No name and no account.'],
+    body: [
+      'Nothing from the calculator — Upshot has no accounts, and doesn’t keep your work between visits. The one thing it stores is your email address, if you choose to give it. See Email below.',
+    ],
   },
   {
     h: 'Not saved',
-    body: ['Your initiatives and results. They stay in your browser tab.'],
+    body: ['Your initiatives and results. They stay in your browser tab and clear when you close it.'],
   },
   {
     h: 'Where',
-    body: ['Supabase, Canada (Central).'],
+    body: [
+      'Supabase, in Canada (Central). That’s where an email address goes if you give one. Nothing from the calculator is stored there today.',
+    ],
   },
   {
     h: 'How long',
-    body: ['Deleted 90 days after you last saved.'],
+    body: ['Your email address stays until you ask to be removed. Nothing from the calculator is kept at all.'],
   },
   {
     h: 'Delete now',
-    body: ['Use the “Delete my saved data” control in the app.'],
+    body: ['Email me and I’ll remove your address: [contact email]. Clearing your browser clears everything else Upshot holds.'],
   },
   {
     h: 'Email',
-    body: ['Optional, with an unsubscribe link in every email.'],
+    body: [
+      'Optional, and it gates nothing. Stored on its own, with no name and nothing linking it to what you did in the calculator. Used only for occasional notes about Upshot, each with an unsubscribe link. Ask to be removed at any time: [contact email].',
+    ],
   },
   {
     h: 'Theme',
@@ -38,7 +48,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   },
   {
     h: 'Analytics and contact',
-    body: ['Analytics: [fill in].', 'Contact: [contact email].'],
+    body: ['Analytics: none. Upshot doesn’t measure your visit, so there is no cookie banner.', 'Contact: [contact email].'],
   },
 ];
 
@@ -46,7 +56,7 @@ export function Privacy() {
   return (
     <>
       <section className="hero hero--page">
-        <p className="kicker">Last updated [date]</p>
+        <p className="kicker">Last updated December 1, 2026</p>
         <h1 className="display">Privacy</h1>
         <p className="kicker">Draft, to be reviewed</p>
       </section>

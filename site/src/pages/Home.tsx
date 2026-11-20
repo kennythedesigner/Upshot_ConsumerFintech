@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { CALCULATOR_URL, CASE_STUDY_URL } from '../components/Chrome';
 import { signupConfigured, subscribe } from '../lib/signup';
+import abCompare from '../assets/ab-compare.png';
 
 /**
  * Home, from Kennedi's Figma Make screens. Copy is built exactly as
@@ -115,7 +116,7 @@ function SignupForm() {
         {state === 'unconfigured' && 'Sign-ups aren’t switched on yet.'}
       </p>
       <p className="signup-note" id="signup-note">
-        [PRIVACY NOTE — one line]
+        Used only for occasional Upshot updates. Unsubscribe in any email.
         <br />
         Optional — does not gate anything on this page.
       </p>
@@ -130,8 +131,8 @@ export function Home() {
         <p className="eyebrow">Upshot — a UX ROI calculator</p>
         <h1 className="display">Should Initiative A or B be prioritized?</h1>
         <p className="lede">
-          Compare two initiatives before either is built, in dollars, with honest ranges. Upshot never
-          names a winner.
+          Compare initiatives in dollars before any of them is built, with honest ranges. Upshot
+          never names a winner.
         </p>
         <p>
           <a className="button button--primary" href={CALCULATOR_URL}>
@@ -166,7 +167,18 @@ export function Home() {
           assumptions, side by side.
         </p>
         <figure className="shot">
-          <div className="shot-frame">[SCREENSHOT: A vs B comparison]</div>
+          {/* Always light, whatever the page theme: it's a photograph of a
+              light-themed screen, so a dark frame around it would read as a
+              mistake. Kennedi's call, 2026-11-20. */}
+          <div className="shot-frame shot-frame--light">
+            <img
+              className="shot-img"
+              src={abCompare}
+              width={1600}
+              height={545}
+              alt="The Upshot comparison screen. Initiative A, a fee and overdraft transparency redesign, shows a 12-month net value of $701,800 on a bar running wide from low to high. Initiative B, a premium-upgrade prompt, shows $113,000 on a much narrower one. The same pattern repeats for ROI: 292% against 105%."
+            />
+          </div>
           <figcaption className="shot-caption">Upshot shows both. It does not tell you which to build.</figcaption>
         </figure>
       </section>
@@ -213,8 +225,7 @@ export function Home() {
           ))}
         </ul>
         <p className="pull">
-          Every other tool in this space audits a product after it ships. Upshot asks the question
-          while it’s still an estimate.
+          Upshot asks the question while it’s still an estimate, not after it ships.
         </p>
       </section>
 
@@ -222,7 +233,11 @@ export function Home() {
         <h2 className="heading" id="builtby-title">
           Built by
         </h2>
-        <p className="section-lede">[BIO PLACEHOLDER — two lines]</p>
+        <p className="section-lede">
+          Kennedi Cosma is a UX and CX designer in Detroit. She built Upshot to make the
+          prioritization conversation a dollars conversation, without pretending the dollars are
+          certain.
+        </p>
         <p>
           <a className="text-link" href={CASE_STUDY_URL}>
             Read the case study →
@@ -232,10 +247,10 @@ export function Home() {
 
       <section className="section" aria-labelledby="signup-title">
         <h2 className="heading" id="signup-title">
-          Know when the dashboard ships
+          Get a note when Upshot changes
         </h2>
         <p className="section-lede">
-          Portfolio totals, goal subtotals and the impact-vs-complexity map are in progress.
+          Goal subtotals are next, then saving your work between visits.
         </p>
         <SignupForm />
       </section>

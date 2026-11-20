@@ -9,7 +9,7 @@ import { ThemeSwitch } from './ThemeSwitch';
  * the calculator button) are Claude's reading of the footer — flagged.
  */
 const CALCULATOR_URL = 'https://app.upshotpm.app';
-const CASE_STUDY_URL = '#'; /* [CASE STUDY LINK] — Kennedi's portfolio URL */
+const CASE_STUDY_URL = 'https://kenthedesigner.com/work/ux-roi';
 const CONTACT_PLACEHOLDER = '[contact email]';
 
 export type PageId = 'home' | 'method' | 'privacy' | 'terms';
@@ -43,17 +43,21 @@ function TopBar({ page }: { page: PageId }) {
           Menu
         </button>
       </div>
+      {/* Mobile's second row. Kennedi's screens left the switch floating here
+          on its own and put the only calculator link inside the menu, so the
+          site's main action was a tap away. Pairing them fills the row and
+          surfaces the CTA without cramming the first row. */}
       <div className="topbar-switch-row">
         <ThemeSwitch />
+        <a className="button button--primary" href={CALCULATOR_URL}>
+          Open the calculator
+        </a>
       </div>
       {open && (
         <nav className="menu" id="site-menu" aria-label="Site">
           <a className="menu-link" href="/method.html">Method</a>
           <a className="menu-link" href="/privacy.html">Privacy</a>
           <a className="menu-link" href="/terms.html">Terms</a>
-          <a className="button button--primary menu-cta" href={CALCULATOR_URL}>
-            Open the calculator
-          </a>
         </nav>
       )}
     </header>

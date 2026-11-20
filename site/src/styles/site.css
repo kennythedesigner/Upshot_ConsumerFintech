@@ -292,9 +292,13 @@ a {
     min-height: 44px;
   }
 
-  /* Kennedi's screens put the switch on its own row under the wordmark. */
+  /* Switch on the left, calculator button on the right, so the row carries
+     the site's main action instead of floating. */
   .topbar-switch-row {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
     margin-top: var(--space-3);
   }
 
@@ -411,6 +415,22 @@ a {
   background: var(--surface-raised);
   color: var(--ink-muted);
   font-size: 14px;
+}
+
+/* The screenshot is of a light screen, so its frame stays light in both
+   themes — the light token values, written out rather than referenced. */
+.shot-frame--light {
+  min-height: 0;
+  padding: var(--space-3);
+  background: #fcfcfb;
+  border-color: #e4e2dc;
+}
+
+.shot-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
 }
 
 .shot-caption {
