@@ -26,9 +26,12 @@ file; Vercel's cleanUrls serves `/method.html` as `/method`). Light and
 dark follow the design system; a two-position theme switch (D65) stores
 the choice in localStorage plus a one-word `upshot_theme` cookie on
 .upshotpm.app, so the site and the calculator stay in step. First visit
-follows the device. The signup form validates (the invalid-email state
-is the system's one allowed red, D66) but has no destination yet — pick
-one before launch. Run it with `cd site && npm ci && npm run dev`.
+follows the device. The signup form posts to Supabase: a sealed
+`email_signup` table that the public key can write to and never read
+(see `supabase/migrations/..._email_signup.sql`). Set
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` — copy
+`.env.example` locally, and add both in Vercel's project settings.
+Without them the form still renders and says sign-ups aren't on. Run it with `cd site && npm ci && npm run dev`.
 
 ## The calculator app (`app/`)
 
@@ -151,7 +154,6 @@ who still have their session; the sweep covers everyone else.
 - Goal / OKR subtotals on the dashboard
 - The two Vercel projects (`site/` at upshotpm.app, `app/` at app.upshotpm.app)
 - Welcome and Onboarding screens in the app, wired to the Supabase save (D52, D53b)
-- A destination for the marketing signup form (validates, but goes nowhere yet)
 - E2E flow tests (checklist section 2)
 - The "Delete my saved data" control (the function behind it is live)
 - Privacy policy (inputs now settled: what is stored, 90 days, in-product delete,

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { CALCULATOR_URL, CASE_STUDY_URL } from '../components/Chrome';
+import { signupConfigured, subscribe } from '../lib/signup';
 
 /**
  * Home, from Kennedi's Figma Make screens. Copy is built exactly as
@@ -50,29 +51,34 @@ const PATTERNS = [
 ];
 
 /**
- * The signup form. Validation is real (the one allowed use of red, D66);
- * the destination is not wired yet, so a valid submit says so plainly
- * instead of pretending to succeed. Wire SIGNUP_ENDPOINT before launch.
+ * The signup form. Validation is real (the one allowed use of red, D66), and
+ * the address goes to Supabase via subscribe_email (D52a, revised).
+ *
+ * "Already on the list" is indistinguishable from a fresh signup, by design:
+ * the database function is silent about it, so this form can't be used to
+ * check whether an address is subscribed.
  */
-const SIGNUP_ENDPOINT = '';
+type SignupState = 'idle' | 'invalid' | 'sending' | 'sent' | 'error' | 'unconfigured';
 
 function SignupForm() {
   const [email, setEmail] = useState('');
-  const [state, setState] = useState<'idle' | 'invalid' | 'sent' | 'unwired'>('idle');
+  const [state, setState] = useState<SignupState>('idle');
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     const trimmed = email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
       setState('invalid');
       return;
     }
-    if (!SIGNUP_ENDPOINT) {
-      setState('unwired');
+    if (!signupConfigured) {
+      setState('unconfigured');
       return;
     }
-    // When an endpoint exists: POST, then show the success line.
-    setState('sent');
+    setState('sending');
+    const result = await subscribe(trimmed);
+    setState(result);
+    if (result === 'sent') setEmail('');
   };
 
   return (
@@ -88,15 +94,16 @@ function SignupForm() {
           name="email"
           autoComplete="email"
           value={email}
+          disabled={state === 'sending'}
           aria-invalid={state === 'invalid' || undefined}
           aria-describedby="signup-status signup-note"
           onChange={(e) => {
             setEmail(e.target.value);
-            if (state === 'invalid') setState('idle');
+            if (state === 'invalid' || state === 'error') setState('idle');
           }}
         />
-        <button type="submit" className="button button--primary">
-          Notify me
+        <button type="submit" className="button button--primary" disabled={state === 'sending'}>
+          {state === 'sending' ? 'Sending…' : 'Notify me'}
         </button>
       </div>
       <p className="signup-status" id="signup-status" role="status">
@@ -104,7 +111,8 @@ function SignupForm() {
           <span className="error-text">Enter an email address like name@example.com.</span>
         )}
         {state === 'sent' && 'You’re on the list.'}
-        {state === 'unwired' && 'Sign-ups aren’t switched on yet. This form gets a destination before launch.'}
+        {state === 'error' && 'That didn’t go through. Try again in a moment.'}
+        {state === 'unconfigured' && 'Sign-ups aren’t switched on yet.'}
       </p>
       <p className="signup-note" id="signup-note">
         [PRIVACY NOTE — one line]
