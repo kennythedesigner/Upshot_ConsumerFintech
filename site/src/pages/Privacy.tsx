@@ -9,6 +9,8 @@
  * the contact address a launch blocker, not a nicety. It is still a
  * placeholder below.
  */
+import { withContactLink } from '../lib/contact';
+
 const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: 'Saved',
@@ -32,12 +34,12 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   },
   {
     h: 'Delete now',
-    body: ['Email me and I’ll remove your address: [contact email]. Clearing your browser clears everything else Upshot holds.'],
+    body: ['Email me and I’ll remove your address: hello@detroitdesignfoundry.com. Clearing your browser clears everything else Upshot holds.'],
   },
   {
     h: 'Email',
     body: [
-      'Optional, and it gates nothing. Stored on its own, with no name and nothing linking it to what you did in the calculator. Used only for occasional notes about Upshot, each with an unsubscribe link. Ask to be removed at any time: [contact email].',
+      'Optional, and it gates nothing. Stored on its own, with no name and nothing linking it to what you did in the calculator. Used only for occasional notes about Upshot, each with an unsubscribe link. Ask to be removed at any time: hello@detroitdesignfoundry.com.',
     ],
   },
   {
@@ -48,7 +50,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   },
   {
     h: 'Analytics and contact',
-    body: ['Analytics: none. Upshot doesn’t measure your visit, so there is no cookie banner.', 'Contact: [contact email].'],
+    body: ['Analytics: none. Upshot doesn’t measure your visit, so there is no cookie banner.', 'Contact: hello@detroitdesignfoundry.com.'],
   },
 ];
 
@@ -65,7 +67,7 @@ export function Privacy() {
           <h2 className="heading">{s.h}</h2>
           {s.body.map((line) => (
             <p className="body-line" key={line}>
-              {line}
+              {withContactLink(line)}
             </p>
           ))}
         </section>

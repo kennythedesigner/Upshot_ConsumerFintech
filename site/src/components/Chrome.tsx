@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { ThemeSwitch } from './ThemeSwitch';
+import { CONTACT_EMAIL } from '../lib/contact';
 
 /**
  * The shared frame: top bar, skip link, footer. Kennedi's screens show the
@@ -10,7 +11,7 @@ import { ThemeSwitch } from './ThemeSwitch';
  */
 const CALCULATOR_URL = 'https://app.upshotpm.app';
 const CASE_STUDY_URL = 'https://kenthedesigner.com/work/ux-roi';
-const CONTACT_PLACEHOLDER = '[contact email]';
+
 
 export type PageId = 'home' | 'method' | 'privacy' | 'terms';
 
@@ -80,7 +81,11 @@ function Footer() {
         <li><a className="text-link" href="/method.html">Method</a></li>
         <li><a className="text-link" href="/privacy.html">Privacy</a></li>
         <li><a className="text-link" href="/terms.html">Terms</a></li>
-        <li><a className="text-link" href="#">{CONTACT_PLACEHOLDER}</a></li>
+        <li>
+          <a className="text-link" href={`mailto:${CONTACT_EMAIL}`}>
+            {CONTACT_EMAIL}
+          </a>
+        </li>
       </ul>
       <p className="fine-print">Directional, not predictive. Never picks a winner.</p>
       <p className="fine-print">Upshot is a portfolio project, not financial advice.</p>

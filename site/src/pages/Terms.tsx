@@ -6,6 +6,8 @@
  * a lawyer — the page stays marked a draft until someone qualified reads it,
  * and the liability sentence is the one most worth a second opinion.
  */
+import { withContactLink } from '../lib/contact';
+
 const SECTIONS: Array<{ h: string; body: string }> = [
   {
     h: 'Educational and portfolio tool',
@@ -22,7 +24,7 @@ const SECTIONS: Array<{ h: string; body: string }> = [
     body:
       'Upshot is provided as-is, with no warranty of any kind. It may change or go offline at any time without notice. To the extent the law allows, Kennedi Cosma is not liable for any loss arising from your use of it.',
   },
-  { h: 'Contact', body: 'Questions about these terms: [contact email].' },
+  { h: 'Contact', body: 'Questions about these terms: hello@detroitdesignfoundry.com.' },
 ];
 
 export function Terms() {
@@ -36,7 +38,7 @@ export function Terms() {
       {SECTIONS.map((s) => (
         <section className="section legal-section" key={s.h} aria-label={s.h}>
           <h2 className="heading">{s.h}</h2>
-          <p className="body-line">{s.body}</p>
+          <p className="body-line">{withContactLink(s.body)}</p>
         </section>
       ))}
     </>
