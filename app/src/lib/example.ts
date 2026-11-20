@@ -20,19 +20,34 @@ export function workedExample(portfolioId: string): Initiative {
   i.consumer_moment = 'fees_overdraft';
   i.consumers_per_month = 180_000;
 
-  i.buckets.now.lift_pts = 1.2;
-  i.buckets.now.value_per_consumer = -4;
-  i.buckets.later.lift_pts = 2.1;
-  i.buckets.later.value_per_consumer = 38;
-  i.buckets.saved.lift_pts = 3.4;
-  i.buckets.saved.value_per_consumer = 11;
+  // Revenue now is fee revenue GIVEN UP: clearer fees mean fewer overdrafts, so
+  // this bucket is negative (D10). A UK field study (Journal of Finance, 2024)
+  // found overdraft alerts cut charges 4–19%; 8 points is mid-range. The fee
+  // avoided is the average US overdraft fee, ~$27 (Bankrate, 2025).
+  i.buckets.now.lift_pts = 8;
+  i.buckets.now.value_per_consumer = -27;
+  // Retention: fee-charged customers are >2× as likely to switch banks (J.D.
+  // Power), so clearer fees keep some. 0.8 points × a year of revenue from a
+  // kept member — Chime ARPAM, $257 (Q4 2025).
+  i.buckets.later.lift_pts = 0.8;
+  i.buckets.later.value_per_consumer = 257;
+  // Cost saved: fewer overdraft surprises mean fewer support contacts. 4 points
+  // × the median assisted-contact cost, $13.50 (Gartner).
+  i.buckets.saved.lift_pts = 4;
+  i.buckets.saved.value_per_consumer = 13.5;
 
+  // BLS developer median wage / 70% wage share ≈ $16,200 a developer-month;
+  // $240,000 ≈ 15 developer-months, in line with a compliance-touching redesign
+  // across several teams (the complexity factors below).
   i.build_cost = 240_000;
   i.run_cost_per_month = 0;
   i.months_until_live = 0;
 
+  // Benchmarks from other banks, not this bank's own data, so Medium / Benchmark.
+  // The small gap between a large fee loss and large retention gains makes the
+  // range very wide — the honest shape of a transparency bet.
   i.confidence = 'medium';
-  i.evidence_type = 'analytics';
+  i.evidence_type = 'benchmark';
 
   i.complexity_factors = ['compliance_signoff', 'multiple_teams'];
   i.must_do = false;

@@ -53,27 +53,29 @@ describe('the worked example', () => {
     expect(at(12).state.kind).toBe('results');
   });
 
-  it('keeps Revenue now as a loss: a positive lift at −$4', () => {
+  it('keeps Revenue now as a loss: fee revenue given up', () => {
     const m = at(12).metrics!;
-    // 180,000 × 1.2% × −$4 = −$8,640 a month
-    expect(m.buckets.now!.monthly.expected).toBeCloseTo(-8_640);
+    // 180,000 × 8% × −$27 = −$388,800 a month
+    expect(m.buckets.now!.monthly.expected).toBeCloseTo(-388_800);
   });
 
   it('matches hand-worked 12-month figures at Medium confidence (±50%)', () => {
     const m = at(12).metrics!;
-    // Monthly: −8,640 + 143,640 + 67,320 = 202,320
-    expect(m.monthlyImpact.expected).toBeCloseTo(202_320);
-    expect(m.impact.expected - m.totalCost).toBeCloseTo(2_187_840);
-    expect(m.roiPct!.expected).toBeCloseTo(911.6, 1);
-    // Low: −12,960 + 71,820 + 33,660 = 92,520 a month
-    expect(m.monthlyImpact.low).toBeCloseTo(92_520);
-    // High: −4,320 + 215,460 + 100,980 = 312,120 a month
-    expect(m.monthlyImpact.high).toBeCloseTo(312_120);
+    // Monthly: −388,800 + 370,080 + 97,200 = 78,480
+    expect(m.monthlyImpact.expected).toBeCloseTo(78_480);
+    expect(m.impact.expected - m.totalCost).toBeCloseTo(701_760);
+    expect(m.roiPct!.expected).toBeCloseTo(292.4, 1);
+    // Low (worst for the business): −583,200 + 185,040 + 48,600 = −349,560 a month
+    expect(m.monthlyImpact.low).toBeCloseTo(-349_560);
+    // High: −194,400 + 555,120 + 145,800 = 506,520 a month
+    expect(m.monthlyImpact.high).toBeCloseTo(506_520);
   });
 
-  it('fires the pressure note always, and "best case may be optimistic" only once the window is long', () => {
+  it('fires the pressure note always, and "best case may be optimistic" at every window', () => {
+    // A's upside is large even in a short window (ROI High > 500% by 3 months),
+    // so both flags show throughout.
     const kinds = (h: number) => at(h).flags.map((f) => f.kind);
-    expect(kinds(3)).toEqual(['pressure_note']);
+    expect(kinds(3)).toEqual(expect.arrayContaining(['pressure_note', 'optimistic']));
     expect(kinds(12)).toContain('optimistic');
   });
 });
@@ -207,13 +209,13 @@ describe('the dashboard', () => {
 
   it('adds base cases only, matching the hand math at 12 months', () => {
     const p = calculatePortfolio(twelve());
-    // A: 2,427,840 expected, 240,000 cost. B: 220,572 expected, 90,000 + 11 × 1,600 = 107,600 cost.
-    expect(p.totals.expectedImpact).toBeCloseTo(2_648_412, 2);
+    // A: 941,760 expected, 240,000 cost. B: 220,572 expected, 90,000 + 11 × 1,600 = 107,600 cost.
+    expect(p.totals.expectedImpact).toBeCloseTo(1_162_332, 2);
     expect(p.totals.totalCost).toBe(347_600);
     // Weighted: A at medium (0.6) + B at low (0.3).
-    expect(p.totals.confidenceWeightedImpact).toBeCloseTo(2_427_840 * 0.6 + 220_572 * 0.3, 2);
-    // (2,648,412 − 347,600) ÷ 347,600.
-    expect(p.totals.roiPct).toBeCloseTo(661.91, 1);
+    expect(p.totals.confidenceWeightedImpact).toBeCloseTo(941_760 * 0.6 + 220_572 * 0.3, 2);
+    // (1,162,332 − 347,600) ÷ 347,600.
+    expect(p.totals.roiPct).toBeCloseTo(234.39, 1);
     expect(p.notCounted).toEqual([]);
   });
 
@@ -236,8 +238,8 @@ describe('the dashboard', () => {
       sortInitiatives(list, results, key).map((i) => i.name);
     expect(order('added')).toEqual([blank.name, b!.name, a!.name]);
     expect(order('net')).toEqual([a!.name, b!.name, blank.name]);
-    expect(order('roi')).toEqual([a!.name, b!.name, blank.name]); // 912% vs 105%
-    expect(order('spread')).toEqual([a!.name, b!.name, blank.name]); // 1,098 vs 307 pts
-    expect(order('priority')).toEqual([a!.name, b!.name, blank.name]); // 6.07 vs 0.61
+    expect(order('roi')).toEqual([a!.name, b!.name, blank.name]); // 292% vs 105%
+    expect(order('spread')).toEqual([a!.name, b!.name, blank.name]); // 4,280 vs 307 pts
+    expect(order('priority')).toEqual([a!.name, b!.name, blank.name]); // 2.35 vs 0.61
   });
 });

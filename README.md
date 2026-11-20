@@ -149,10 +149,9 @@ who still have their session; the sweep covers everyone else.
 ## Not built yet
 
 - Goal / OKR subtotals on the dashboard
-- The Vercel project for `app/` (root directory `app`, domain app.upshotpm.app)
+- The two Vercel projects (`site/` at upshotpm.app, `app/` at app.upshotpm.app)
 - Welcome and Onboarding screens in the app, wired to the Supabase save (D52, D53b)
-- Worked example A's sourced inputs (D64, open). B's are sourced: see
-  [docs/worked-example-sources.md](docs/worked-example-sources.md)
+- A destination for the marketing signup form (validates, but goes nowhere yet)
 - E2E flow tests (checklist section 2)
 - The "Delete my saved data" control (the function behind it is live)
 - Privacy policy (inputs now settled: what is stored, 90 days, in-product delete,
